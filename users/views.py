@@ -4,7 +4,7 @@ from django.views.generic.edit import CreateView,FormView
 from django.views import View
 from django.contrib.auth.hashers import make_password
 
-from .forms import CustomUserCreationForm, PasswordResetRequestForm,PasswordResetForm
+from .forms import CustomUserCreationForm, PasswordResetRequestForm,PasswordResetForm,PasswordChangeForm
 from .models import CustomUser
 
 class SignUpView(CreateView):
@@ -42,6 +42,27 @@ class PasswordResetFormView(FormView):
         user.password = make_password(new_password)
         user.save()
         return super().form_valid(form)
+    
+class PasswordChangeView(FormView):
+    form_class = PasswordChangeForm
+    template_name = 'registration/password_change.html'
+    success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        old_password = form.cleaned_data['old_password']
+        new_password = form.cleaned_data['new_password']
+        confirm_password = form.cleaned_data['confirm_password']
+        user = self.request.user
+        if user.check_password(old_password):
+            if new_password == confirm_password:
+                user.password = make_password(new_password)
+                user.save()
+                return super().form_valid(form)
+            else:
+                form.add_error('confirm_password', 'Passwords do not match.')
+        else:
+            form.add_error('old_password', 'Incorrect password.')
+        return self.form_invalid(form)
 
     
 

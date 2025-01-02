@@ -20,3 +20,10 @@ class PasswordResetRequestForm(forms.Form):
 
 class PasswordResetForm(forms.Form):
     new_password = forms.CharField(max_length=100, widget=forms.PasswordInput)
+
+class PasswordChangeForm(forms.Form):
+    old_password = forms.CharField(max_length=100, widget=forms.PasswordInput)
+    new_password = forms.CharField(max_length=100, widget=forms.PasswordInput)
+    confirm_password = forms.CharField(max_length=100, widget=forms.PasswordInput)
+
+    
