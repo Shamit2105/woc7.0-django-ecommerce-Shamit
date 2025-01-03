@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # INSTALLED_APPS
     'users',
     'pages',
+    #'items',
 ]
 AUTH_USER_MODEL = 'users.CustomUser'
 MIDDLEWARE = [
@@ -87,7 +88,8 @@ DATABASES = {
         'PORT' : 5432
     }
 }
-
+MEDIA_URL = '/media/' # new
+MEDIA_ROOT = str(BASE_DIR.joinpath('media'))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
