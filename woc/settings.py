@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     # INSTALLED_APPS
     'users',
     'pages',
-    #'items',
+    'products',
 ]
 AUTH_USER_MODEL = 'users.CustomUser'
 MIDDLEWARE = [
