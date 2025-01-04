@@ -17,6 +17,6 @@
         
         
         <p>Description: {{ item.description }}</p>
-        
+        <a href="{% url 'order' item.pk  %}" class="btn btn-primary">Order</a>
     </div>
 {% endblock content %}

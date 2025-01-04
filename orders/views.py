@@ -1,10 +1,8 @@
 from django.urls import reverse_lazy
-from django.shortcuts import render, redirect
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views import View
-
-from .forms import UserOrderForm, CartForm
-from .models import UserOrder, Cart
+from django.shortcuts import get_object_or_404
+from django.views.generic.edit import CreateView
+from .forms import UserOrderForm
+from .models import UserOrder
 from products.models import Item
 
 class UserOrderCreateView(CreateView):
@@ -13,18 +11,16 @@ class UserOrderCreateView(CreateView):
     template_name = 'userorder_form.html'
     success_url = reverse_lazy('home')
     
-    def order_failed(self, form):
-        item = form.cleaned_data['item_ordered']
-        quantity = form.cleaned_data['quantity']
-        if quantity > item.stock:
-            form.add_error('quantity', 'Ordered quantity exceeds available stock.')
-            return True
-        return False
+    def get_initial(self):
+        initial = super().get_initial()
+        item_id = self.kwargs.get('item_id')
+        item = get_object_or_404(Item, id=item_id)
+        initial['item_ordered'] = item
+        return initial
 
     def form_valid(self, form):
-        if self.order_failed(form):
-            return self.form_invalid(form)
-        response = super().form_valid(form)
-        return redirect(self.success_url)
-
-
+        item_id = self.kwargs.get('item_id')
+        item = get_object_or_404(Item, id=item_id)
+        form.instance.item_ordered = item
+        form.instance.ordered_by = self.request.user  # Set the ordered_by field to the current user
+        return super().form_valid(form)

@@ -30,6 +30,7 @@ class Item(models.Model):
     def discounted_price(self):
         return self.price - self.discount*self.price/100
 
+
     def __str__(self):
         return self.name
     
