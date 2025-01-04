@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # INSTALLED_APPS
+    # STARTAPPS
     'users',
     'pages',
     'products',
+    'orders',
 ]
 AUTH_USER_MODEL = 'users.CustomUser'
 MIDDLEWARE = [
