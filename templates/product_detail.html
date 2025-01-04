@@ -1,0 +1,22 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Detail of {{item.name}}{% endblock title %}
+
+{% block content %}
+<h3>{{item.name}}</h3>
+<div class="row">
+    <div class="col-md-6">
+        <img src="{{ item.image.url }}" class="img-fluid" alt="{{ item.name }}">
+    </div>
+    <div class="col-md-6">
+        <p>Brand: {{ item.brand }}</p>
+        <p>Price: ₹{{ item.price }}</p>
+        
+        <p>Category: {{ item.category }}</p>
+        
+        
+        <p>Description: {{ item.description }}</p>
+        
+    </div>
+{% endblock content %}

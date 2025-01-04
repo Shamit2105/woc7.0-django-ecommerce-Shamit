@@ -23,8 +23,8 @@ Home
                     <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ item.name }}</h5>
-                    <p class="card-text">{{ item.description }}</p>
+                    <h5 class="card-title"><a href="{% url 'product_detail' item.pk %}">{{ item.name }}</a></h5>
+                    <p class="card-text">{{ item.brand }}</p>
                     <p class="card-text">Price: ₹{{ item.price }}</p>
                 </div>
             </div>

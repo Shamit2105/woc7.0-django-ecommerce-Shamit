@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: 1px solid #ddd; /* Add a border to distinguish items */
+    border: 1px solid black; /* Add a border to distinguish items */
     margin-bottom: 15px; /* Add some space between items */
 }
 
