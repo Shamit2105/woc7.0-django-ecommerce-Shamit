@@ -28,6 +28,30 @@
             </button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav ms-auto">
+                    {% if user.user_type == 'seller' %}
+                    <li class="nav-item dropdown">
+                        <a 
+                            class="nav-link dropdown-toggle" 
+                            href="#" 
+                            id="userDropdown" 
+                            role="button" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false">
+                            Seller Options
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'create_category' user.id %}">Create Category</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'create_subcategory' user.id %}">Create Subcategory</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'create_item' user.id %}">Create Item</a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a 

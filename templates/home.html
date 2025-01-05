@@ -10,11 +10,12 @@ Home
 <div class="container mt-4">
     <h1>Welcome to our store!</h1>
     {% if user.is_authenticated %}
-    <h3>Welcome, {{ user.username }}!</h3>
+        <h3>Welcome, {{ user.username }}!</h3>
     {% else %}
-    <h3>Welcome Guest</h3>
-    <a href="{% url 'login' %}">Login</a> | <a href="{% url 'signup' %}">Sign Up</a>
+        <h3>Welcome Guest</h3>
+        <a href="{% url 'login' %}">Login</a> | <a href="{% url 'signup' %}">Sign Up</a>
     {% endif %}
+    
     <div class="row">
         {% for item in items %}
         <div class="col-md-4 mb-4">
@@ -27,11 +28,14 @@ Home
                     <p class="card-text">{{ item.brand }}</p>
                     <span class="original-price"><strike>₹{{ item.price }}</strike></span>
                     <span class="discounted-price">₹{{ item.discounted_price }}</span>
+                    {% if user.user_type == "customer" or user.is_authenticated == False %}
                     <a href="{% url 'order' item.pk %}" class="btn btn-primary">Order</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    
 </div>
-{% endblock content %}
+{% endblock content %}  
