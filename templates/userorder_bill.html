@@ -1,0 +1,18 @@
+{% extends '_base.html' %}
+
+{% block title %}Bill for Order #{{ order.get_unique_bill_id }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Bill for Order #{{ order.get_unique_bill_id }}</h1>
+    <p><strong>Ordered By:</strong> {{ order.ordered_by.username }}</p>
+    <p><strong>Item Ordered:</strong> {{ order.item_ordered.name }}</p>
+    <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+    <p><strong>Total Price:</strong> ₹{{ order.get_total_price }}</p>
+    <p><strong>Address:</strong> {{ order.address }}</p>
+    <p><strong>Phone:</strong> {{ order.phone }}</p>
+    <p><strong>Order Date:</strong> {{ order.date }}</p>
+    <p><strong>Delivery Date:</strong> {{ order.get_delivery_date }}</p>
+    <p><strong>Days Remaining for Delivery:</strong> {{ order.get_days_remaining }}</p>
+</div>
+{% endblock content %}

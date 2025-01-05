@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import CustomUser
 from products.models import Item
+from datetime import timedelta,timezone
 
 class UserOrder(models.Model):
     ordered_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -20,6 +21,16 @@ class UserOrder(models.Model):
     
     def get_total_price(self):
         return self.quantity * self.item_ordered.price
+    def get_total_price(self):
+        return self.quantity * self.price
+
+    def get_delivery_date(self):
+        return self.date + timedelta(days=7)  # Assuming a fixed delivery time of 7 days
+
+ 
+
+    def get_unique_bill_id(self):
+        return f'BILL-{self.id:08d}'
     
 
 class Cart(models.Model):
