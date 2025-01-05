@@ -4,8 +4,9 @@ from django.views.generic.edit import CreateView
 from .forms import UserOrderForm
 from .models import UserOrder
 from products.models import Item
+from .mixins import CustomerRequiredMixin
 
-class UserOrderCreateView(CreateView):
+class UserOrderCreateView(CustomerRequiredMixin, CreateView):
     model = UserOrder
     form_class = UserOrderForm
     template_name = 'userorder_form.html'
@@ -23,6 +24,7 @@ class UserOrderCreateView(CreateView):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
         kwargs['item'] = item
+        kwargs['user'] = self.request.user  # Pass the user to the form
         return kwargs
 
     def form_valid(self, form):

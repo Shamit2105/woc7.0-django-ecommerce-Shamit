@@ -10,6 +10,15 @@
    
 </head>
 <body>
+    <div class="container">
+        {% if messages %}
+            <div class="alert alert-danger" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>  
     <nav class="navbar navbar-expand-lg bg-gray-600">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'home' %}">ECOMMERCE PLATFORM</a>

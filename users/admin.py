@@ -11,14 +11,14 @@ class CustomUserAdmin(UserAdmin):
     list_display = ['username', 'email', 'first_name', 'last_name', 'phno', 'country', 'state', 'security_question', 'security_answer']
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phno', 'country', 'state', 'security_question', 'security_answer')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phno', 'country', 'state', 'security_question', 'security_answer','user_type')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2', 'email', 'first_name', 'last_name', 'phno', 'country', 'state', 'security_question', 'security_answer', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'fields': ('username', 'password1', 'password2', 'email', 'first_name', 'last_name', 'phno', 'country', 'state', 'security_question', 'security_answer','user_type', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
         }),
     )
 
