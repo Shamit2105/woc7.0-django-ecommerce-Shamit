@@ -31,3 +31,14 @@
     justify-content: center;
     align-items: center;
 }
+.card-body .original-price {
+    text-decoration: line-through;
+    color: #888;
+    margin-right: 10px;
+}
+
+.card-body .discounted-price {
+    color: red;
+    font-weight: bold;
+    font-size: 1.2em;
+}

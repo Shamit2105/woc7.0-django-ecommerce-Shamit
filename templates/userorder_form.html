@@ -8,6 +8,7 @@
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
+      <p>Total Price: ₹{{ item.price }}</p>
       <button type="submit">Place Order</button>
   </form>
   </div>

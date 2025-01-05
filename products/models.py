@@ -34,6 +34,7 @@ class Item(models.Model):
     def __str__(self):
         return self.name
     
+    
 
 @receiver(post_save, sender=Item)
 def update_subcategories(sender, instance, **kwargs):

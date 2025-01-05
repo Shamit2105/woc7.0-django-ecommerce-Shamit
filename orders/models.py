@@ -13,6 +13,7 @@ class UserOrder(models.Model):
     phone = models.CharField(max_length=10)
     date = models.DateTimeField(auto_now_add=True)
     couponcode = models.CharField(max_length=10, blank=True, null=True)
+    price = models.DecimalField(max_digits=8,decimal_places=2,null=True)
 
     def __str__(self):
         return f'{self.ordered_by} ordered {self.quantity} {self.item_ordered} on {self.date}'

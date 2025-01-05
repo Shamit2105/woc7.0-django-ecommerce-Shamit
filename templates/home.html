@@ -25,7 +25,8 @@ Home
                 <div class="card-body">
                     <h5 class="card-title"><a href="{% url 'product_detail' item.pk %}">{{ item.name }}</a></h5>
                     <p class="card-text">{{ item.brand }}</p>
-                    <p class="card-text">Price: ₹{{ item.price }}</p>
+                    <span class="original-price"><strike>₹{{ item.price }}</strike></span>
+                    <span class="discounted-price">₹{{ item.discounted_price }}</span>
                     <a href="{% url 'order' item.pk %}" class="btn btn-primary">Order</a>
                 </div>
             </div>

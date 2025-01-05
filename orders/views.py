@@ -18,6 +18,13 @@ class UserOrderCreateView(CreateView):
         initial['item_ordered'] = item
         return initial
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        item_id = self.kwargs.get('item_id')
+        item = get_object_or_404(Item, id=item_id)
+        kwargs['item'] = item
+        return kwargs
+
     def form_valid(self, form):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
