@@ -1,0 +1,16 @@
+{% extends '_base.html' %}
+
+{% block title %}
+Order All Items
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Order All Items</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Order All Items</button>
+    </form>
+</div>
+{% endblock content %}

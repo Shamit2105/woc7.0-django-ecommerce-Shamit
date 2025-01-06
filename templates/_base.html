@@ -52,11 +52,13 @@
                         </ul>
                     </li>
                     {% endif %}
-                    {% if user.is_authenticated %}
+                    {% if user.user_type == 'customer' %}
                     <a class="nav-link" href="{% url 'cart' %}">
                         <i class="fas fa-shopping-cart"></i> Cart
                         <span class="badge badge-pill badge-primary">{{ cart_item_count }}</span>
                     </a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a 
                             class="nav-link dropdown-toggle" 

@@ -29,13 +29,16 @@ Home
                     <span class="original-price"><strike>₹{{ item.price }}</strike></span>
                     <span class="discounted-price">₹{{ item.discounted_price }}</span>
                     {% if user.user_type == "customer" or user.is_authenticated == False %}
+                    {% if item.stock > 0 %}
                     <a href="{% url 'order' item.pk %}" class="btn btn-primary">Order</a>
                     <form method="post" action="{% url 'add_to_cart' item.pk %}">
                         {% csrf_token %}
                         <br>
-                        
                         <button type="submit" class="btn btn-primary">Add to Cart</button>
                     </form>
+                    {% else %}
+                    <p class="text-danger">Out of Stock</p>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>

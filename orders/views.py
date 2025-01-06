@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy, reverse
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.edit import CreateView
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic import DetailView,ListView
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,7 +8,7 @@ from django.contrib import messages
 
 
 from products.models import Item
-from .forms import UserOrderForm
+from .forms import UserOrderForm,CartOrderForm
 from .models import UserOrder,Cart
 from .mixins import CustomerRequiredMixin
 
@@ -58,9 +58,9 @@ class AddToCartView(LoginRequiredMixin, View):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
         cart_item, created = Cart.objects.get_or_create(user=request.user, item=item)
-        if not created:
-            cart_item.quantity += 1
-            cart_item.save()
+        
+        cart_item.quantity += 1
+        cart_item.save()
         return redirect('home')
     
 class CartListView(LoginRequiredMixin, ListView):
@@ -77,4 +77,44 @@ class CartListView(LoginRequiredMixin, ListView):
         context['total_price'] = total_price
         return context
     
+class CartDeleteView(LoginRequiredMixin, DeleteView):
+    model = Cart
+    success_url = reverse_lazy('cart')
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+    
+class CartOrderView(View): #will have to use view items bulk ma 
+    def get(self,request,*args,**kwargs):
+        form = CartOrderForm
+        return render(request, 'cart_order.html', {'form': form})
+
+    def post(self,request,*args,**kwargs):
+        form = CartOrderForm(request.POST)
+        
+        if form.is_valid():
+            cart_items = Cart.objects.filter(user=request.user)
+            if not cart_items.exists():
+                messages.error(request, "Your cart is empty.")
+                return redirect('cart')
+            for cart_item in cart_items:
+                item = cart_item.item
+                quantity = cart_item.quantity
+                UserOrder.objects.create(
+                    ordered_by = request.user,
+                    item_ordered = item,
+                    quantity=quantity,
+                    state = form.cleaned_data['state'],
+                    city = form.cleaned_data['city'],
+                    pincode = form.cleaned_data['pincode'],
+                    address = form.cleaned_data['address'],
+                    phone = form.cleaned_data['phone'],
+                    price = item.discounted_price() * quantity
+                )
+                item.stock -= quantity
+                item.save()
+            cart_items.delete()
+            messages.success(request, "All items in your cart have been ordered.")
+            return redirect('my_orders')
+        return render(request, 'order_form.html', {'form': form})
 

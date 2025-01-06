@@ -26,6 +26,14 @@ class UserOrderForm(forms.ModelForm):
             order.save()
         return order
 
+class CartOrderForm(forms.Form):
+    state = forms.CharField(max_length=100)
+    city = forms.CharField(max_length=100)
+    pincode = forms.CharField(max_length=6)
+    address = forms.CharField(widget=forms.Textarea)
+    phone = forms.CharField(max_length=10)
+    couponcode = forms.CharField(max_length=10)
+
 
 
     
