@@ -1,7 +1,7 @@
 from django.db import models
 from users.models import CustomUser
 from products.models import Item
-from datetime import timedelta,timezone
+from datetime import timedelta
 
 class UserOrder(models.Model):
     ordered_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -21,8 +21,7 @@ class UserOrder(models.Model):
     
     def get_total_price(self):
         return self.quantity * self.item_ordered.price
-    def get_total_price(self):
-        return self.quantity * self.price
+    
 
     def get_delivery_date(self):
         return self.date + timedelta(days=7)  # Assuming a fixed delivery time of 7 days
@@ -33,16 +32,15 @@ class UserOrder(models.Model):
         return f'BILL-{self.id:08d}'
     
 
-class Cart(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-    in_stock = models.BooleanField(default=True)
 
-    def not_in_stock(self):
-        if self.quantity > self.item.stock:
-            self.in_stock = False
-            self.save()
-        return self.in_stock
+
+class Cart(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+
+    def get_total_price(self):
+        return self.item.discounted_price() * self.quantity
     
     def __str__(self):
-        return f'{self.quantity} {self.item}'
+        return f'{self.user.username} - {self.item.name} - '

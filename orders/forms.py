@@ -26,7 +26,6 @@ class UserOrderForm(forms.ModelForm):
             order.save()
         return order
 
-class CartForm(forms.ModelForm):
-    class Meta:
-        model = Cart
-        fields = ['quantity']
+
+
+    

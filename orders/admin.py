@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .forms import UserOrderForm,CartForm
+from .forms import UserOrderForm
 from .models import UserOrder, Cart
 
 class UserOrderAdmin(admin.ModelAdmin):
@@ -10,7 +10,6 @@ class UserOrderAdmin(admin.ModelAdmin):
 admin.site.register(UserOrder, UserOrderAdmin)
 
 class CartOrderAdmin(admin.ModelAdmin):
-    add_form = CartForm
     model = Cart
-    list_display = ['item', 'quantity', 'in_stock']
+    list_display = ['user','item', ]
 admin.site.register(Cart, CartOrderAdmin)

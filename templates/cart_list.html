@@ -1,0 +1,32 @@
+{% extends '_base.html' %}
+
+{% block title %}
+My Cart
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>My Cart</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cart_item in cart_items %}
+            <tr>
+                <td>{{ cart_item.item.name }}</td>
+                <td>{{ cart_item.quantity }}</td>
+                <td>₹{{ cart_item.item.discounted_price }}</td>
+                <td>₹{{ cart_item.get_total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h3>Total Price: ₹{{ total_price }}</h3>
+</div>
+{% endblock content %}
