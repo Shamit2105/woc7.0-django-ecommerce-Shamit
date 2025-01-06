@@ -73,7 +73,7 @@ TEMPLATES = [
         },
     },
 ]
-
+TIME_ZONE = 'Asia/Kolkata'
 WSGI_APPLICATION = 'woc.wsgi.application'
 
 
@@ -121,7 +121,6 @@ LOGOUT_REDIRECT_URL = 'home'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 

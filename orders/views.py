@@ -5,7 +5,7 @@ from django.views.generic import DetailView,ListView
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-
+from django import forms
 
 from products.models import Item
 from .forms import UserOrderForm,CartOrderForm
@@ -35,10 +35,17 @@ class UserOrderCreateView(CustomerRequiredMixin, CreateView):
     def form_valid(self, form):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
+        quantity = form.cleaned_data['quantity']
+
+        if quantity > item.stock:
+            messages.error(self.request, "No stock available")
+            return redirect('home')
+        
         form.instance.item_ordered = item
         form.instance.ordered_by = self.request.user  
         form.save()  
         return redirect('order_bill', pk=form.instance.pk)
+        
 
 class UserOrderBillView(LoginRequiredMixin,DetailView):
     model = UserOrder
@@ -117,4 +124,15 @@ class CartOrderView(View): #will have to use view items bulk ma
             messages.success(request, "All items in your cart have been ordered.")
             return redirect('my_orders')
         return render(request, 'order_form.html', {'form': form})
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        user = self.user
+        cart_items = Cart.objects.filter(user=user)
+        for cart_item in cart_items:
+            item = cart_item.item
+            if cart_item.quantity > item.stock:
+                messages.error( "No stock available")
+                redirect('home')
+        return cleaned_data
 
