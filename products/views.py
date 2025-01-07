@@ -1,11 +1,9 @@
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.shortcuts import render
-from django.views.generic import ListView,TemplateView,DetailView
-from django.views.generic.edit import CreateView,FormView
-
+from django.views.generic import CreateView, ListView, DetailView
+from django.contrib import messages
+from .forms import CategoryForm, SubCategoryForm, ItemForm
 from .models import Category, SubCategory, Item
-from .forms import CategoryForm,SubCategoryForm,ItemForm
-# Create your views here.
 
 class CategoryCreateView(CreateView):
     model = Category
@@ -25,6 +23,27 @@ class ItemCreateView(CreateView):
     form_class = ItemForm
     success_url = reverse_lazy('home')
 
+    def get_form(self, form_class=None):
+        form = super(ItemCreateView, self).get_form(form_class)
+        form.fields['subcategories'].queryset = SubCategory.objects.none()
+
+        if self.request.POST:
+            form = ItemForm(self.request.POST, self.request.FILES)
+            if form.is_valid():
+                category_id = form.cleaned_data.get('category').id
+                form.fields['subcategories'].queryset = SubCategory.objects.filter(category_id=category_id).order_by('subcategories')
+        else:
+            form = ItemForm()
+        return form
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        subcategories = form.cleaned_data['subcategories']
+        for subcategory in subcategories:
+            self.object.subcategories.add(subcategory)
+        messages.success(self.request, "Item created successfully.")
+        return response
+
 class ItemListView(ListView):
     template_name = 'home.html'
     context_object_name = 'items'
@@ -34,6 +53,3 @@ class ItemListView(ListView):
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'product_detail.html'
-    
-    
-
