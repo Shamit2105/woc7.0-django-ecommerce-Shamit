@@ -9,7 +9,7 @@ class UserOrderForm(forms.ModelForm):
         model = UserOrder
         fields = ['quantity', 'state', 'city', 'pincode', 'address', 'phone', 'couponcode', 'price']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): 
         self.user = kwargs.pop('user', None)
         item = kwargs.pop('item', None)
         super().__init__(*args, **kwargs)

@@ -7,9 +7,33 @@
     <h1>Order</h1>
     <form method="post">
       {% csrf_token %}
-      {{ form.as_p }}
-      <p>Total Price: ₹{{ item.price }}</p>
-      <button type="submit">Place Order</button>
-  </form>
+      {{ form.non_field_errors }}
+      <div class="form-group mb-3">
+        {{ form.quantity.label_tag }} {{ form.quantity }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.state.label_tag }} {{ form.state }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.city.label_tag }} {{ form.city }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.pincode.label_tag }} {{ form.pincode }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.address.label_tag }} {{ form.address }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.phone.label_tag }} {{ form.phone }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.couponcode.label_tag }} {{ form.couponcode }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.price.label_tag }} {{ form.price }}
+        <span class="text-muted">(Price of 1 item: ₹{{ item.discounted_price }})</span>
+      </div>
+      <button type="submit" class="btn btn-primary">Place Order</button>
+    </form>
   </div>
 {% endblock content %}
