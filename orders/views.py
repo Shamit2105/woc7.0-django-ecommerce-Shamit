@@ -17,24 +17,24 @@ class UserOrderCreateView(CustomerRequiredMixin, CreateView):
     form_class = UserOrderForm
     template_name = 'userorder_form.html'
     
-    def get_initial(self):
+    def get_initial(self):#set item_ordered to item by default when it loads
         initial = super().get_initial()
         item_id = self.kwargs.get('item_id')
-        item = get_object_or_404(Item, id=item_id)
+        item = get_object_or_404(Item, pk=item_id)
         initial['item_ordered'] = item
         return initial
 
-    def get_form_kwargs(self):
+    def get_form_kwargs(self):#pass the data of order for logged in user
         kwargs = super().get_form_kwargs()
         item_id = self.kwargs.get('item_id')
-        item = get_object_or_404(Item, id=item_id)
+        item = get_object_or_404(Item, pk=item_id)
         kwargs['item'] = item
         kwargs['user'] = self.request.user  
         return kwargs
 
-    def form_valid(self, form):
+    def form_valid(self, form):#check for stock-quantity inequality and 
         item_id = self.kwargs.get('item_id')
-        item = get_object_or_404(Item, id=item_id)
+        item = get_object_or_404(Item, pk=item_id)
         quantity = form.cleaned_data['quantity']
 
         if quantity > item.stock:
@@ -91,7 +91,7 @@ class CartDeleteView(LoginRequiredMixin, DeleteView):
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
     
-class CartOrderView(View): #will have to use view items bulk ma 
+class CartOrderView(View): #will have to use view as items bulk ma 
     def get(self,request,*args,**kwargs):
         form = CartOrderForm
         return render(request, 'cart_order.html', {'form': form})

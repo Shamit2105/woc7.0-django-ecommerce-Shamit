@@ -71,6 +71,9 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li>
+                                <a class="dropdown-item" href="{% url 'my_orders'  %}">My Orders</a>
+                            </li>
+                            <li>
                                 <a class="dropdown-item" href="{% url 'password_change' user.id %}">Change Password</a>
                             </li>
                             <li>
@@ -78,9 +81,6 @@
                                     {% csrf_token %}
                                     <button type="submit" class="dropdown-item">Logout</button>
                                 </form>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'my_orders'  %}">My Orders</a>
                             </li>
                         </ul>
                     </li>

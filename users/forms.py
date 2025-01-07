@@ -16,7 +16,12 @@ class CustomUserChangeForm(UserChangeForm):
 
 class PasswordResetRequestForm(forms.Form):
     email = forms.EmailField(max_length=100)
+    security_question = forms.ChoiceField(choices=[])
     security_answer = forms.CharField(max_length=100, widget=forms.PasswordInput)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        self.fields['security_question'].choices = CustomUser.questions
+    
 
 class PasswordResetForm(forms.Form):
     new_password = forms.CharField(max_length=100, widget=forms.PasswordInput)

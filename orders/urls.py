@@ -9,4 +9,7 @@ urlpatterns = [
     path('cart/', CartListView.as_view(), name='cart'),
     path('cart/delete/<int:pk>/', CartDeleteView.as_view(), name='cart_delete'),
     path('cart/order-all/', CartOrderView.as_view(), name='order_all_cart_items'),
-]
+]#je specific item ne add karvanu hoy tyare item_id, 
+
+#delete cart ma cart ma item avi gai hati, etle pachi eni primary key(pk) e cart item 
+#tarike ni ganaay

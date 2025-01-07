@@ -24,8 +24,8 @@ class UserOrder(models.Model):
     
 
     def get_delivery_date(self):
-        return self.date + timedelta(days=7)  # Assuming a fixed delivery time of 7 days
-
+        delivery_date = self.date + timedelta(days=7)  # Assuming a fixed delivery time of 7 days
+        return f'by {delivery_date.strftime("%d-%m-%Y %H:%M:%S")}'
  
 
     def get_unique_bill_id(self):

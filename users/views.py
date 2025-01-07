@@ -19,13 +19,18 @@ class PasswordResetRequestView(FormView):
 
     def form_valid(self, form):
         email = form.cleaned_data['email']
+        security_question = form.cleaned_data['security_question']
         security_answer = form.cleaned_data['security_answer']
+
         try:
             user = CustomUser.objects.get(email=email)
-            if user.security_answer == security_answer:
-                return redirect('password_reset_form', user_id=user.id)
+            if user.security_question != security_question:
+                form.add_error('security_question', 'Incorrect security question.')
             else:
-                form.add_error('security_answer', 'Incorrect security answer.')
+                if user.security_answer == security_answer:
+                    return redirect('password_reset_form', user_id=user.id)
+                else:
+                    form.add_error('security_answer', 'Incorrect security answer.')
         except CustomUser.DoesNotExist:
             form.add_error('email', 'Email not found.')
         return self.form_invalid(form)
