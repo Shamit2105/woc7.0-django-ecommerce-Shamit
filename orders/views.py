@@ -17,14 +17,8 @@ class UserOrderCreateView(CustomerRequiredMixin, CreateView):
     form_class = UserOrderForm
     template_name = 'userorder_form.html'
     
-    def get_initial(self):#set item_ordered to item by default when it loads
-        initial = super().get_initial()
-        item_id = self.kwargs.get('item_id')
-        item = get_object_or_404(Item, pk=item_id)
-        initial['item_ordered'] = item
-        return initial
 
-    def get_form_kwargs(self):#pass the data of order for logged in user
+    def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, pk=item_id)
@@ -64,9 +58,11 @@ class AddToCartView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
-        cart_item, created = Cart.objects.get_or_create(user=request.user, item=item)
-        
-        cart_item.quantity += 1
+        cart_item,created = Cart.objects.get_or_create(user=request.user, item=item)
+        if not created:
+            cart_item.quantity += 1
+        else:
+            cart_item.quantity += 1
         cart_item.save()
         return redirect('home')
     
@@ -84,6 +80,26 @@ class CartListView(LoginRequiredMixin, ListView):
         context['total_price'] = total_price
         return context
     
+class IncreaseQuantityView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        cart_item = get_object_or_404(Cart, id=kwargs['pk'], user=request.user)
+        
+        
+        cart_item.quantity += 1
+        cart_item.save()
+        return redirect('cart')
+
+class DecreaseQuantityView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        cart_item = get_object_or_404(Cart, id=kwargs['pk'], user=request.user)
+        
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+        return redirect('cart')
+    
 class CartDeleteView(LoginRequiredMixin, DeleteView):
     model = Cart
     success_url = reverse_lazy('cart')
@@ -91,7 +107,7 @@ class CartDeleteView(LoginRequiredMixin, DeleteView):
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
     
-class CartOrderView(View): #will have to use view as items bulk ma 
+class CartOrderView(View): #will have to use view instead of createview as items bulk ma 
     def get(self,request,*args,**kwargs):
         form = CartOrderForm
         return render(request, 'cart_order.html', {'form': form})
