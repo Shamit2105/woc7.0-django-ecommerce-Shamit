@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView
 from django.contrib import messages
+from django.db.models import Q
+
 from .forms import CategoryForm, SubCategoryForm, ItemForm
 from .models import Category, SubCategory, Item
 
@@ -23,7 +25,8 @@ class ItemCreateView(CreateView):
     form_class = ItemForm
     success_url = reverse_lazy('home')
 
-    def get_form(self, form_class=None):
+
+    def get_form(self, form_class=None):#to display subcategories option that the seller currently has
         form = super(ItemCreateView, self).get_form(form_class)
         form.fields['subcategories'].queryset = SubCategory.objects.none()
 
@@ -36,7 +39,7 @@ class ItemCreateView(CreateView):
             form = ItemForm()
         return form
 
-    def form_valid(self, form):
+    def form_valid(self, form):#after validating form, we add subcategory to subcategories
         response = super().form_valid(form)
         subcategories = form.cleaned_data['subcategories']
         for subcategory in subcategories:
@@ -53,3 +56,34 @@ class ItemListView(ListView):
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'product_detail.html'
+
+
+
+class SearchResultsListView(ListView):
+    model = Item
+    context_object_name = 'items'
+    template_name = 'search_results.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if not query:
+            return Item.objects.none()  # Return an empty queryset if no query is provided
+
+        items = Item.objects.filter(
+            Q(name__icontains=query) | 
+            Q(category__name__icontains=query) | 
+            Q(subcategories__subcategories__icontains=query)
+        ).distinct()
+
+        if not items.exists():
+            messages.warning(self.request, "No such item found.")
+            return Item.objects.none()  # Return an empty queryset to prevent errors
+
+        return items
+
+    def get(self, request, *args, **kwargs):
+        if not self.get_queryset().exists():
+            return redirect('home')  # Redirect to home if no items are found
+        return super().get(request, *args, **kwargs)
+
+        
