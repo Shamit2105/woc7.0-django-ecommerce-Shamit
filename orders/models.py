@@ -32,6 +32,16 @@ class UserOrder(models.Model):
         return f'BILL-{self.id:08d}'
     
 
+class Order(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+
+    def get_total_price(self):
+        return self.item.discounted_price() * self.quantity
+    
+    def __str__(self):
+        return f'{self.user.username} - {self.item.name} - '
 
 
 class Cart(models.Model):

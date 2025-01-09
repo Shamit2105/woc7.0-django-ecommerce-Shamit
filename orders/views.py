@@ -8,84 +8,105 @@ from django.contrib import messages
 from django import forms
 
 from products.models import Item
-from .forms import UserOrderForm,CartOrderForm
-from .models import UserOrder,Cart
+from .forms import UserOrderForm,OrderForm
+from .models import UserOrder,Order,Cart
 from .mixins import CustomerRequiredMixin
 
-class UserOrderCreateView(CustomerRequiredMixin, CreateView):
-    model = UserOrder
-    form_class = UserOrderForm
-    template_name = 'userorder_form.html'
+class OrderConfirmView(View):
+    def get(self, request, *args, **kwargs):
+        item_id = self.kwargs.get('item_id')
+        item = get_object_or_404(Item, id=item_id)
+        order, created = Order.objects.get_or_create(user=request.user, item=item)
+        if created:
+            order.quantity = 1
+        else:
+            order.quantity += 1
+        order.save()
+        messages.success(request, f'{item.name} has been added to your order.')
+        return redirect('order')
+    
+class OrderLView(ListView):
+    model = Order
+    template_name = 'order_summary.html'
+    context_object_name = 'cart_items'
+
+    def get_queryset(self):
+        # Fetch current orders
+        orders = Order.objects.filter(user=self.request.user)
+        return orders
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        item_id = self.kwargs.get('item_id')
-        item = get_object_or_404(Item, pk=item_id)
-        quantity = int(self.request.GET.get('quantity', 1))
-        context['item'] = item
-        context['user'] = self.request.user
-        context['quantity'] = quantity
-        context['price'] = item.discounted_price() * quantity
+        # Calculate total price of current orders
+        total_price = sum(item.get_total_price() for item in context['cart_items'])
+        context['total_price'] = total_price
+
+        # Reset the current orders and move them to the cart
+        self.reset_orders_to_cart()
         return context
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        item_id = self.kwargs.get('item_id')
-        item = get_object_or_404(Item, pk=item_id)
-        quantity = int(self.request.GET.get('quantity', 1))
-        kwargs['item'] = item
-        kwargs['user'] = self.request.user
-        kwargs['quantity'] = quantity
-        return kwargs
+    def reset_orders_to_cart(self):
+        # Move orders to cart and reset orders
+        orders = Order.objects.filter(user=self.request.user)
+        for order in orders:
+            cart_item, created = Cart.objects.get_or_create(user=self.request.user, item=order.item)
+            cart_item.quantity += order.quantity  # Add quantity if cart item exists
+            cart_item.save()
+        orders.delete()  # Clear current orders
 
-    def form_valid(self, form):
-        item_id = self.kwargs.get('item_id')
-        item = get_object_or_404(Item, pk=item_id)
-        quantity = int(self.request.GET.get('quantity', 1))
-
-        if quantity > item.stock:
-            messages.error(self.request, "No stock available")
-            return redirect('home')
-        
-        form.instance.item_ordered = item
-        form.instance.ordered_by = self.request.user
-        form.instance.quantity = quantity
-        form.save()
-        return redirect('order_bill', pk=form.instance.pk)
-class UserOrderSummaryView(LoginRequiredMixin, View):
-    def get(self,request,*args,**kwargs):
-        item_id = self.kwargs.get('item_id')
-        item = get_object_or_404(Item,pk=item_id)
-        context = {
-            'item': item,
-            'quantity': 1,
-            'total_price': item.discounted_price
-        }
-        return render(request,'order_summary.html',context)
     
-    def post(self,request,*args,**kwargs):
-        item_id = self.kwargs.get('item_id')
-        quantity = int(request.POST.get('quantity',1))
-        item = get_object_or_404(Item,pk=item_id)
-        if quantity > item.stock:
-            messages.error(request, "No stock available")
-            return redirect('order_summary', item_id=item_id)
-        total_price = item.discounted_price() * quantity
-        context = {
-            'item': item,
-            'quantity': quantity,
-            'total_price': total_price
-        }
-        return render(request, 'order_summary.html', context)
-        
+    
+class OrderView(View): #will have to use view instead of createview as items bulk ma 
+    def get(self,request,*args,**kwargs):
+        form = OrderForm
+        return render(request, 'order_form.html', {'form': form})
 
+    def post(self,request,*args,**kwargs):
+        form = OrderForm(request.POST)
+        
+        if form.is_valid():
+            items = Order.objects.filter(user=request.user)
+            if not items.exists():
+                messages.error(request, "Your cart is empty.")
+                return redirect('cart')
+            for cart_item in items:
+                item = cart_item.item
+                quantity = cart_item.quantity
+                UserOrder.objects.create(
+                    ordered_by = request.user,
+                    item_ordered = item,
+                    quantity=quantity,
+                    state = form.cleaned_data['state'],
+                    city = form.cleaned_data['city'],
+                    pincode = form.cleaned_data['pincode'],
+                    address = form.cleaned_data['address'],
+                    phone = form.cleaned_data['phone'],
+                    price = item.discounted_price() * quantity
+                )
+                item.stock -= quantity
+                item.save()
+            items.delete()
+            messages.success(request, "All items in your cart have been ordered.")
+            return redirect('my_orders')
+        return render(request, 'order_form.html', {'form': form})
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        user = self.user
+        cart_items = Order.objects.filter(user=user)
+        for cart_item in cart_items:
+            item = cart_item.item
+            if cart_item.quantity > item.stock:
+                messages.error( "No stock available")
+                redirect('home')
+        return cleaned_data
 
 class UserOrderBillView(LoginRequiredMixin,DetailView):
     model = UserOrder
     template_name = 'userorder_bill.html'
     context_object_name = 'order'
 
-class UserOrderListView(LoginRequiredMixin, ListView):
+class PreviousOrderListView(LoginRequiredMixin, ListView):
     model = UserOrder
     template_name = 'userorder_list.html'
     context_object_name = 'orders'
@@ -148,11 +169,11 @@ class CartDeleteView(LoginRequiredMixin, DeleteView):
     
 class CartOrderView(View): #will have to use view instead of createview as items bulk ma 
     def get(self,request,*args,**kwargs):
-        form = CartOrderForm
+        form = OrderForm
         return render(request, 'cart_order.html', {'form': form})
 
     def post(self,request,*args,**kwargs):
-        form = CartOrderForm(request.POST)
+        form = OrderForm(request.POST)
         
         if form.is_valid():
             cart_items = Cart.objects.filter(user=request.user)

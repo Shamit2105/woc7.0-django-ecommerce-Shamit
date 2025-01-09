@@ -25,7 +25,6 @@ class ItemCreateView(CreateView):
     form_class = ItemForm
     success_url = reverse_lazy('home')
 
-
     def get_form(self, form_class=None):#to display subcategories option that the seller currently has
         form = super(ItemCreateView, self).get_form(form_class)
         form.fields['subcategories'].queryset = SubCategory.objects.none()
@@ -56,8 +55,6 @@ class ItemListView(ListView):
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'product_detail.html'
-
-
 
 class SearchResultsListView(ListView):
     model = Item

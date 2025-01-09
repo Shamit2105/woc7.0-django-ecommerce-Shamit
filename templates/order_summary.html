@@ -15,21 +15,18 @@
             </tr>
         </thead>
         <tbody>
+            {% for cart_item in cart_items %}
             <tr>
-                <td>{{ item.name }}</td>
-                <td>
-                    <form action="{% url 'order_summary' item.pk %}" method="post">
-                        {% csrf_token %}
-                        <input type="number" name="quantity" value="{{ quantity }}" min="1" max="{{ item.stock }}" class="form-control" style="width: 80px; display: inline;">
-                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                    </form>
-                </td>
-                <td>₹{{ item.discounted_price }}</td>
-                <td>₹{{ total_price }}</td>
+                <td>{{ cart_item.item.name }}</td>
+                <td>{{ cart_item.quantity }}</td>
+                <td>₹{{ cart_item.item.discounted_price }}</td>
+                <td>₹{{ cart_item.get_total_price }}</td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
-    <a href="{% url 'order' item.pk %}?quantity={{ quantity }}" class="btn btn-success">Proceed to Order</a>
-    <a href ="{% url 'home' %}" class = "btn btn-primary">Back to Home</a>
+    <h3>Total Price: ₹{{ total_price }}</h3>
+    <a href="{% url 'order_form'  %}" class="btn btn-success">Proceed to Order</a>
+    <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
 </div>
 {% endblock %}
