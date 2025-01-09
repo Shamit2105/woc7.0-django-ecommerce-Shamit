@@ -20,7 +20,7 @@ class UserOrder(models.Model):
         return f'{self.ordered_by} ordered {self.quantity} {self.item_ordered} on {self.date}'
     
     def get_total_price(self):
-        return self.quantity * self.item_ordered.price
+        return self.quantity * self.item_ordered.discounted_price()
     
 
     def get_delivery_date(self):

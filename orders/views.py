@@ -16,30 +16,69 @@ class UserOrderCreateView(CustomerRequiredMixin, CreateView):
     model = UserOrder
     form_class = UserOrderForm
     template_name = 'userorder_form.html'
-    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        item_id = self.kwargs.get('item_id')
+        item = get_object_or_404(Item, pk=item_id)
+        quantity = int(self.request.GET.get('quantity', 1))
+        context['item'] = item
+        context['user'] = self.request.user
+        context['quantity'] = quantity
+        context['price'] = item.discounted_price() * quantity
+        return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, pk=item_id)
+        quantity = int(self.request.GET.get('quantity', 1))
         kwargs['item'] = item
-        kwargs['user'] = self.request.user  
+        kwargs['user'] = self.request.user
+        kwargs['quantity'] = quantity
         return kwargs
 
-    def form_valid(self, form):#check for stock-quantity inequality and 
+    def form_valid(self, form):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, pk=item_id)
-        quantity = form.cleaned_data['quantity']
+        quantity = int(self.request.GET.get('quantity', 1))
 
         if quantity > item.stock:
             messages.error(self.request, "No stock available")
             return redirect('home')
         
         form.instance.item_ordered = item
-        form.instance.ordered_by = self.request.user  
-        form.save()  
+        form.instance.ordered_by = self.request.user
+        form.instance.quantity = quantity
+        form.save()
         return redirect('order_bill', pk=form.instance.pk)
+class UserOrderSummaryView(LoginRequiredMixin, View):
+    def get(self,request,*args,**kwargs):
+        item_id = self.kwargs.get('item_id')
+        item = get_object_or_404(Item,pk=item_id)
+        context = {
+            'item': item,
+            'quantity': 1,
+            'total_price': item.discounted_price
+        }
+        return render(request,'order_summary.html',context)
+    
+    def post(self,request,*args,**kwargs):
+        item_id = self.kwargs.get('item_id')
+        quantity = int(request.POST.get('quantity',1))
+        item = get_object_or_404(Item,pk=item_id)
+        if quantity > item.stock:
+            messages.error(request, "No stock available")
+            return redirect('order_summary', item_id=item_id)
+        total_price = item.discounted_price() * quantity
+        context = {
+            'item': item,
+            'quantity': quantity,
+            'total_price': total_price
+        }
+        return render(request, 'order_summary.html', context)
         
+
 
 class UserOrderBillView(LoginRequiredMixin,DetailView):
     model = UserOrder

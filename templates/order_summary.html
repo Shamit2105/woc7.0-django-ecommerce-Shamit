@@ -1,0 +1,35 @@
+{% extends '_base.html' %}
+
+{% block title %}Order Summary{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Order Summary</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>
+                    <form action="{% url 'order_summary' item.pk %}" method="post">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ quantity }}" min="1" max="{{ item.stock }}" class="form-control" style="width: 80px; display: inline;">
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    </form>
+                </td>
+                <td>₹{{ item.discounted_price }}</td>
+                <td>₹{{ total_price }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <a href="{% url 'order' item.pk %}?quantity={{ quantity }}" class="btn btn-success">Proceed to Order</a>
+    <a href ="{% url 'home' %}" class = "btn btn-primary">Back to Home</a>
+</div>
+{% endblock %}

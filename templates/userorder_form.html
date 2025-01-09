@@ -9,7 +9,12 @@
       {% csrf_token %}
       {{ form.non_field_errors }}
       <div class="form-group mb-3">
-        {{ form.quantity.label_tag }} {{ form.quantity }}
+        <label for="quantity">Quantity</label>
+        <input type="text" id="quantity" name="quantity" value="{{ quantity }}" class="form-control" readonly>
+      </div>
+      <div class="form-group mb-3">
+        <label for="price">Price</label>
+        <input type="text" id="price" name="price" value="{{ price }}" class="form-control" readonly>
       </div>
       <div class="form-group mb-3">
         {{ form.state.label_tag }} {{ form.state }}
@@ -29,11 +34,7 @@
       <div class="form-group mb-3">
         {{ form.couponcode.label_tag }} {{ form.couponcode }}
       </div>
-      <div class="form-group mb-3">
-        {{ form.price.label_tag }} {{ form.price }}
-        <span class="text-muted">(Price of 1 item: ₹{{ item.discounted_price }})</span>
-      </div>
-      <button type="submit" class="btn btn-primary">Place Order</button>
+      <button type="submit" class="btn btn-primary">Submit Order</button>
     </form>
   </div>
-{% endblock content %}
+{% endblock %}
