@@ -20,6 +20,12 @@ class OrderConfirmView(View):
         item = get_object_or_404(Item, id=item_id)
         items = Order.objects.filter(user=request.user)
         for i in items:
+            cart_item,created = Cart.objects.get_or_create(user=request.user, item=i.item)
+            if not created:
+                cart_item.quantity += 1
+            else:
+                cart_item.quantity = 1
+            cart_item.save()
             i.delete()
         order, created = Order.objects.get_or_create(user=request.user, item=item)
         if created:
