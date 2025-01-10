@@ -2,13 +2,15 @@ from django.urls import path
 from .views import (
     OrderView, UserOrderBillView, OrderConfirmView, PreviousOrderListView,OrderLView,
     AddToCartView, CartListView, CartDeleteView, CartOrderView,
-    DecreaseQuantityView, IncreaseQuantityView, 
+    DecreaseQuantityView, IncreaseQuantityView, OrderIncreaseQuantityView,OrderDecreaseQuantityView
 )
 
 urlpatterns = [
     path('order_summary/<int:item_id>', OrderConfirmView.as_view(), name='order_confirm'),
     path('order_s', OrderLView.as_view(), name='order'),
     path('order/', OrderView.as_view(), name='order_form'),
+    path('order/increase/<int:pk>/', OrderIncreaseQuantityView.as_view(), name='order_increase'),
+    path('order/decrease/<int:pk>/', OrderDecreaseQuantityView.as_view(), name='order_decrease'),
     path('bill/<int:pk>/', UserOrderBillView.as_view(), name='order_bill'),
     path('my-orders/', PreviousOrderListView.as_view(), name='my_orders'),
     path('add-to-cart/<int:item_id>/', AddToCartView.as_view(), name='add_to_cart'),

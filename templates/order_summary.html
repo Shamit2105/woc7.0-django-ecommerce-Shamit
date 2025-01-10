@@ -21,12 +21,22 @@
                 <td>{{ cart_item.quantity }}</td>
                 <td>₹{{ cart_item.item.discounted_price }}</td>
                 <td>₹{{ cart_item.get_total_price }}</td>
+                <td>
+                    <form action="{% url 'order_increase' cart_item.pk %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">+</button>
+                    </form>
+                    <form action="{% url 'order_decrease' cart_item.pk %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">-</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     <h3>Total Price: ₹{{ total_price }}</h3>
     <a href="{% url 'order_form'  %}" class="btn btn-success">Proceed to Order</a>
-    <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+    <a href="{% url 'home' %}?redirected_from=home" class="btn btn-primary">Back to Home</a>
 </div>
 {% endblock %}

@@ -12,19 +12,26 @@ from .forms import UserOrderForm,OrderForm
 from .models import UserOrder,Order,Cart
 from .mixins import CustomerRequiredMixin
 
+
+
 class OrderConfirmView(View):
     def get(self, request, *args, **kwargs):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
+        items = Order.objects.filter(user=request.user)
+        for i in items:
+            i.delete()
         order, created = Order.objects.get_or_create(user=request.user, item=item)
         if created:
             order.quantity = 1
         else:
-            order.quantity += 1
+            order.quantity = 1
         order.save()
+        
         messages.success(request, f'{item.name} has been added to your order.')
         return redirect('order')
     
+ 
 class OrderLView(ListView):
     model = Order
     template_name = 'order_summary.html'
@@ -40,22 +47,26 @@ class OrderLView(ListView):
         # Calculate total price of current orders
         total_price = sum(item.get_total_price() for item in context['cart_items'])
         context['total_price'] = total_price
-
-        # Reset the current orders and move them to the cart
-        self.reset_orders_to_cart()
+        
         return context
 
-    def reset_orders_to_cart(self):
-        # Move orders to cart and reset orders
-        orders = Order.objects.filter(user=self.request.user)
-        for order in orders:
-            cart_item, created = Cart.objects.get_or_create(user=self.request.user, item=order.item)
-            cart_item.quantity += order.quantity  # Add quantity if cart item exists
-            cart_item.save()
-        orders.delete()  # Clear current orders
+class OrderIncreaseQuantityView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        cart_item = get_object_or_404(Order, id=kwargs['pk'], user=request.user)
+        cart_item.quantity += 1
+        cart_item.save()
+        return redirect('order')
 
-    
-    
+class OrderDecreaseQuantityView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        cart_item = get_object_or_404(Order, id=kwargs['pk'], user=request.user)
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+        return redirect('order')
+
 class OrderView(View): #will have to use view instead of createview as items bulk ma 
     def get(self,request,*args,**kwargs):
         form = OrderForm
@@ -143,8 +154,6 @@ class CartListView(LoginRequiredMixin, ListView):
 class IncreaseQuantityView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         cart_item = get_object_or_404(Cart, id=kwargs['pk'], user=request.user)
-        
-        
         cart_item.quantity += 1
         cart_item.save()
         return redirect('cart')
@@ -152,7 +161,6 @@ class IncreaseQuantityView(LoginRequiredMixin, View):
 class DecreaseQuantityView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         cart_item = get_object_or_404(Cart, id=kwargs['pk'], user=request.user)
-        
         if cart_item.quantity > 1:
             cart_item.quantity -= 1
             cart_item.save()
