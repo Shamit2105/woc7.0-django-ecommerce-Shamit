@@ -18,5 +18,11 @@ class ItemForm(forms.ModelForm):
         widgets = {
             'subcategories': forms.CheckboxSelectMultiple(),
         }
+    
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = ['rating','reviews']
+        
 
     

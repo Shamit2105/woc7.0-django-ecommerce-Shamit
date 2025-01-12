@@ -4,7 +4,7 @@ from django.views.generic import CreateView, ListView, DetailView
 from django.contrib import messages
 from django.db.models import Q
 
-from .forms import CategoryForm, SubCategoryForm, ItemForm
+from .forms import CategoryForm, SubCategoryForm, ItemForm, ReviewForm
 from .models import Category, SubCategory, Item
 
 class CategoryCreateView(CreateView):
@@ -83,4 +83,8 @@ class SearchResultsListView(ListView):
             return redirect('home')  # Redirect to home if no items are found
         return super().get(request, *args, **kwargs)
 
+class ItemReviewCreate(CreateView):
+    model = Item
+    form_class = ReviewForm
+    template_name = 'item_detail.html'
         
