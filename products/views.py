@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import Q
 
 from .forms import CategoryForm, SubCategoryForm, ItemForm, ReviewForm
-from .models import Category, SubCategory, Item
+from .models import Category, SubCategory, Item, Review
 
 class CategoryCreateView(CreateView):
     model = Category
@@ -83,8 +83,16 @@ class SearchResultsListView(ListView):
             return redirect('home')  # Redirect to home if no items are found
         return super().get(request, *args, **kwargs)
 
-class ItemReviewCreate(CreateView):
-    model = Item
+class ItemReviewCreateView(CreateView):
+    model = Review
     form_class = ReviewForm
     template_name = 'item_detail.html'
-        
+    success_url = reverse_lazy('item_detail')
+
+    def form_valid(self, form):
+        item = get_object_or_404(Item,pk=self.kwargs['pk'])
+        form.instance.item = item
+        form.instance.review_author = self.request.user
+        return super().form_valid(form)
+
+    

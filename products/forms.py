@@ -1,5 +1,5 @@
 from django import forms
-from .models import Category, SubCategory, Item
+from .models import Category, SubCategory, Item,Review
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -21,8 +21,8 @@ class ItemForm(forms.ModelForm):
     
 class ReviewForm(forms.ModelForm):
     class Meta:
-        model = Item
-        fields = ['rating','reviews']
+        model = Review
+        fields = ['rating', 'review'] 
         
 
     

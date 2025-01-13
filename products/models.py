@@ -28,6 +28,17 @@ class Item(models.Model):
     image = models.ImageField(upload_to='items/')
     brand = models.CharField(max_length=100)
     subcategories = models.ManyToManyField(SubCategory)
+    
+
+    def discounted_price(self):
+        return self.price - self.discount * self.price / 100
+
+    def __str__(self):
+        return self.name
+
+
+class Review(models.Model):
+    item = models.ForeignKey(Item,on_delete=models.CASCADE,default=1)
     RATING_CHOICES = [
         (1, '1 Star'),
         (2, '2 Stars'),
@@ -37,16 +48,13 @@ class Item(models.Model):
     ]
     
     # Rating field to hold the star rating (1 to 5)
-    rating = models.IntegerField(choices=RATING_CHOICES,default=3)
-    reviews = models.TextField(null=True)
     review_author = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True)
-
-    def discounted_price(self):
-        return self.price - self.discount * self.price / 100
+    rating = models.IntegerField(choices=RATING_CHOICES,default=3)
+    review = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True,null=True)
 
     def __str__(self):
-        return self.name
-
+        return f"Review for {self.item.name} by {self.review_author.username}"
 
 @receiver(post_save, sender=Item)
 def update_subcategories(sender, instance, **kwargs):

@@ -20,5 +20,11 @@
         
         <p>Description: {{ item.description }}</p>
         <a href="{% url 'order_confirm' item.pk  %}" class="btn btn-primary">Order</a>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit Review</button>
+        </form>
+        
     </div>
 {% endblock content %}
