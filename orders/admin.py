@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .forms import UserOrderForm
-from .models import UserOrder, Cart
+from .models import UserOrder, Cart, Order
 
 class UserOrderAdmin(admin.ModelAdmin):
     add_form = UserOrderForm
@@ -13,3 +13,8 @@ class CartOrderAdmin(admin.ModelAdmin):
     model = Cart
     list_display = ['user','item', ]
 admin.site.register(Cart, CartOrderAdmin)
+
+class UserOAdmin(admin.ModelAdmin):
+    model = Order
+    list_display = ['user','item', 'quantity']
+admin.site.register(Order,UserOAdmin)

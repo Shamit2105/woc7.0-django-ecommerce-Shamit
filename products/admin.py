@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .forms import CategoryForm, SubCategoryForm, ItemForm
-from .models import Category, SubCategory, Item
+from .models import Category, SubCategory, Item, Review
 
 class CategoryAdmin(admin.ModelAdmin):
     model = Category
@@ -21,4 +21,9 @@ class ItemAdmin(admin.ModelAdmin):
     add_form = ItemForm
     list_display = ('name', 'description', 'price', 'category', 'discount', 'stock', 'image', 'brand')
 admin.site.register(Item, ItemAdmin)
+
+class ReviewAdmin(admin.ModelAdmin):
+    model = Review
+    list_display = ('review_author','item','rating','created_at','review')
+admin.site.register(Review,ReviewAdmin)
 
