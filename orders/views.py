@@ -7,7 +7,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django import forms
 
-from products.models import Item
+from products.forms import ReviewForm
+from products.models import Item,Review
 from .forms import UserOrderForm,OrderForm
 from .models import UserOrder,Order,Cart
 from .mixins import CustomerRequiredMixin

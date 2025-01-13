@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView,View
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
+from orders.models import UserOrder
 from .forms import CategoryForm, SubCategoryForm, ItemForm, ReviewForm
 from .models import Category, SubCategory, Item, Review
 
@@ -56,6 +58,12 @@ class ItemDetailView(DetailView):
     model = Item
     template_name = 'product_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Fetch all reviews for the specific item
+        context['reviews'] = Review.objects.filter(item=self.object).order_by('-created_at')  # Assuming `created_at` exists
+        return context
+
 class SearchResultsListView(ListView):
     model = Item
     context_object_name = 'items'
@@ -83,16 +91,36 @@ class SearchResultsListView(ListView):
             return redirect('home')  # Redirect to home if no items are found
         return super().get(request, *args, **kwargs)
 
-class ItemReviewCreateView(CreateView):
-    model = Review
-    form_class = ReviewForm
-    template_name = 'item_detail.html'
-    success_url = reverse_lazy('item_detail')
+class ReviewView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        form = ReviewForm()
+        return render(request, 'review_form.html', {'form': form})
 
-    def form_valid(self, form):
-        item = get_object_or_404(Item,pk=self.kwargs['pk'])
-        form.instance.item = item
-        form.instance.review_author = self.request.user
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        item_id = kwargs.get('item_id')
+        item = get_object_or_404(Item, id=item_id)
+
+        # Check if the user has ordered this item
+        if not UserOrder.objects.filter(ordered_by=request.user, item_ordered=item).exists():
+            messages.error(request, "You can only review items you have purchased.")
+            return redirect('userorder_list.html')  # Redirect to item detail or another page
+
+        # Process the review form
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            if Review.objects.filter(item=item, review_author=request.user).exists():
+                messages.error(request, "You have already reviewed this item.")
+                return redirect('home')
+            Review.objects.create(
+                item=item,
+                review_author=request.user,
+                review=form.cleaned_data['review'],
+                rating=form.cleaned_data['rating']
+            )
+            messages.success(request, f"Your review for {item.name} has been successfully submitted!")
+            return redirect('home')
+
+        # Re-render form on error
+        return render(request, 'review_form.html', {'form': form})
 
     

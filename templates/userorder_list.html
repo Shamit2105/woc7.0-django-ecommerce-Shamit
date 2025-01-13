@@ -30,6 +30,7 @@ My Orders
                 <td>{{ order.get_delivery_date }}</td>
                 <td>
                     <a href="{% url 'order_bill' order.pk %}" class="btn btn-primary">View Bill</a>
+                    <a href="{% url 'review_form' order.item_ordered.pk %}" class = "btn btn-success">Review</a>
                 </td>
             </tr>
             {% endfor %}

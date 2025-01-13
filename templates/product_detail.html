@@ -20,11 +20,20 @@
         
         <p>Description: {{ item.description }}</p>
         <a href="{% url 'order_confirm' item.pk  %}" class="btn btn-primary">Order</a>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Submit Review</button>
-        </form>
         
+        {% if reviews %}
+            <ul>
+                {% for review in reviews %}
+                    <li>
+                        <strong>{{ review.review_author.username }}</strong> 
+                        (Rating: {{ review.rating }}/5):
+                        <p>{{ review.review }}</p>
+                        <p><small>Reviewed on {{ review.created_at|date:"F j, Y, g:i a" }}</small></p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reviews yet. Be the first to review this item!</p>
+        {% endif %}
     </div>
 {% endblock content %}
