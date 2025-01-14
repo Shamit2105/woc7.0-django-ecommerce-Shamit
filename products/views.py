@@ -61,7 +61,7 @@ class ItemDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Fetch all reviews for the specific item
-        context['reviews'] = Review.objects.filter(item=self.object).order_by('-created_at')  # Assuming `created_at` exists
+        context['reviews'] = Review.objects.filter(item=self.object).order_by('-created_at')  
         return context
 
 class SearchResultsListView(ListView):
@@ -72,7 +72,7 @@ class SearchResultsListView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         if not query:
-            return Item.objects.none()  # Return an empty queryset if no query is provided
+            return Item.objects.none()  
 
         items = Item.objects.filter(
             Q(name__icontains=query) | 
@@ -82,13 +82,13 @@ class SearchResultsListView(ListView):
 
         if not items.exists():
             messages.warning(self.request, "No such item found.")
-            return Item.objects.none()  # Return an empty queryset to prevent errors
+            return Item.objects.none()  
 
         return items
 
     def get(self, request, *args, **kwargs):
         if not self.get_queryset().exists():
-            return redirect('home')  # Redirect to home if no items are found
+            return redirect('home')  
         return super().get(request, *args, **kwargs)
 
 class ReviewView(LoginRequiredMixin, View):
@@ -100,12 +100,9 @@ class ReviewView(LoginRequiredMixin, View):
         item_id = kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
 
-        # Check if the user has ordered this item
         if not UserOrder.objects.filter(ordered_by=request.user, item_ordered=item).exists():
             messages.error(request, "You can only review items you have purchased.")
-            return redirect('userorder_list.html')  # Redirect to item detail or another page
-
-        # Process the review form
+            return redirect('userorder_list.html') 
         form = ReviewForm(request.POST)
         if form.is_valid():
             if Review.objects.filter(item=item, review_author=request.user).exists():
@@ -120,7 +117,6 @@ class ReviewView(LoginRequiredMixin, View):
             messages.success(request, f"Your review for {item.name} has been successfully submitted!")
             return redirect('home')
 
-        # Re-render form on error
         return render(request, 'review_form.html', {'form': form})
 
     
