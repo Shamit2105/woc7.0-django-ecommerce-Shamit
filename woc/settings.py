@@ -40,7 +40,6 @@ INSTALLED_APPS = [
 
     # STARTAPPS
     'users',
-    'pages',
     'products',
     'orders',
 ]
