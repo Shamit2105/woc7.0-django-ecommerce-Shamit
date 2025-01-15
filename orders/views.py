@@ -15,7 +15,7 @@ from .mixins import CustomerRequiredMixin
 
 
 
-class OrderConfirmView(View):
+class OrderConfirmView(CustomerRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
@@ -39,7 +39,7 @@ class OrderConfirmView(View):
         return redirect('order')
     
  
-class OrderLView(ListView):
+class OrderLView(LoginRequiredMixin,ListView):
     model = Order
     template_name = 'order_summary.html'
     context_object_name = 'cart_items'

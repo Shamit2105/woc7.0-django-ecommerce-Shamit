@@ -5,18 +5,21 @@ from django.dispatch import receiver
 from users.models import CustomUser
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(max_length=500)
+    name = models.CharField(max_length=100, unique=True)
+    
 
     def __str__(self):
         return self.name
-    
+
 class SubCategory(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    subcategories = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)  # changed to field name for clarity
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+
+    class Meta:
+        unique_together = ('name', 'category')  
 
     def __str__(self):
-        return self.subcategories
+        return f"{self.name} ({self.category.name})"
 
 class Item(models.Model):
     name = models.CharField(max_length=100)
@@ -28,7 +31,6 @@ class Item(models.Model):
     image = models.ImageField(upload_to='items/')
     brand = models.CharField(max_length=100)
     subcategories = models.ManyToManyField(SubCategory)
-    
 
     def discounted_price(self):
         return self.price - self.discount * self.price / 100
@@ -47,7 +49,6 @@ class Review(models.Model):
         (5, '5 Stars'),
     ]
     
-    # Rating field to hold the star rating (1 to 5)
     review_author = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True)
     rating = models.IntegerField(choices=RATING_CHOICES,default=3)
     review = models.TextField(null=True)
