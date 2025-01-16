@@ -13,7 +13,7 @@ class ItemForm(forms.ModelForm):
         category_name = self.cleaned_data['category_name']
         subcategories_names = self.cleaned_data['subcategories_names']
 
-        category, _ = Category.objects.get_or_create(name=category_name)
+        category, created = Category.objects.get_or_create(name=category_name)
 
         
         item = super().save(commit=False)

@@ -15,20 +15,7 @@ class ItemCreateView(CreateView):
     template_name = 'item_create.html'
     success_url = reverse_lazy('home')
 
-    def form_valid(self,form):
-        category_name = form.cleaned_data['category_name']
-        subcategories_names = form.cleaned_data.get('subcategories_name','')
-        
-        category, created = Category.objects.get_or_create(name=category_name)
-        form.instance.category = category
-        response = super().form_valid(form)
-        if subcategories_names:
-            subcategory_names_list = [name.strip() for name in subcategories_names.split(',')]
-            for subcategory_name in subcategory_names_list:
-                subcategory, _ = SubCategory.objects.get_or_create(name=subcategory_name, category=category)
-                form.instance.subcategories.add(subcategory)
-
-        return response
+    
 
 class ItemListView(ListView):
     template_name = 'home.html'
@@ -59,7 +46,7 @@ class SearchResultsListView(ListView):
         items = Item.objects.filter(
             Q(name__icontains=query) | 
             Q(category__name__icontains=query) | 
-            Q(subcategories__subcategories__icontains=query)
+            Q(subcategories__name__icontains=query)
         ).distinct()
 
         if not items.exists():
