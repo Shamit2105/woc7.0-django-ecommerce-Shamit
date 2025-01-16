@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
 
 from users.models import CustomUser
@@ -31,6 +31,18 @@ class Item(models.Model):
     image = models.ImageField(upload_to='items/')
     brand = models.CharField(max_length=100)
     subcategories = models.ManyToManyField(SubCategory)
+    ratings = models.DecimalField(default=0.0,max_digits=3,decimal_places=2)
+
+    """ jyare aapni entity(item) bija entity ni foreign key hoy ane e entity ni item specific fields access
+    karvi hoy tyare e class name_set.all() karine kari saki"""
+    def avg_rating(self): 
+        reviews = self.review_set.all()
+        if reviews:
+            total = sum(review.rating for review in reviews)
+            avg = total/reviews.count()
+            return avg
+        return 0.0
+        
 
     def discounted_price(self):
         return self.price - self.discount * self.price / 100
@@ -56,9 +68,7 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review for {self.item.name} by {self.review_author.username}"
+    
 
-@receiver(post_save, sender=Item)
-def update_subcategories(sender, instance, **kwargs):
-    for subcategory in instance.subcategories.all():
-        subcategory_instance = SubCategory.objects.get(id=subcategory.id)
-        subcategory_instance.save()
+
+

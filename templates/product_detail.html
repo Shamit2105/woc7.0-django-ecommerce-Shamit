@@ -21,7 +21,7 @@
         <p>Description: {{ item.description }}</p>
         <a href="{% url 'order_confirm' item.pk  %}" class="btn btn-primary">Order</a>
         
-        
+        <h6>Ratings : {{ item.avg_rating }}</h6>
     </div>
     {% if reviews %}
     <ul>
