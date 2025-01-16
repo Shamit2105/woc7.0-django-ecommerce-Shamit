@@ -7,9 +7,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django import forms
 
-from products.forms import ReviewForm
-from products.models import Item,Review
-from .forms import UserOrderForm,OrderForm
+
+from products.models import Item
+from .forms import OrderForm
 from .models import UserOrder,Order,Cart
 from .mixins import CustomerRequiredMixin
 
@@ -29,10 +29,8 @@ class OrderConfirmView(CustomerRequiredMixin,View):
             cart_item.save()
             i.delete()
         order, created = Order.objects.get_or_create(user=request.user, item=item)
-        if created:
-            order.quantity = 1
-        else:
-            order.quantity = 1
+        
+        order.quantity = 1
         order.save()
         
         messages.success(request, f'{item.name} has been added to your order.')
