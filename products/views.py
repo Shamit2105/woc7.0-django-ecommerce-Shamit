@@ -17,11 +17,39 @@ class ItemCreateView(CreateView):
 
     
 
-class ItemListView(ListView):
+class ItemListView(View):
     template_name = 'home.html'
-    context_object_name = 'items'
-    def get_queryset(self):
-        return Item.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        # Handle initial page load or reset filters
+        categories = Category.objects.all()
+        subcategories = SubCategory.objects.all()
+        items = Item.objects.all()
+
+        return render(request, self.template_name, {
+            'categories': categories,
+            'subcategories': subcategories,
+            'items': items,
+        })
+
+    def post(self, request, *args, **kwargs):
+        category = request.POST.get('category')
+        subcategory = request.POST.get('subcategory')
+        items = Item.objects.all()
+        if category:
+            items = items.filter(category__name=category)
+        if subcategory:
+            items = items.filter(subcategories__name=subcategory)
+        categories = Category.objects.all()
+        subcategories = SubCategory.objects.all()
+        return render(request, self.template_name, {
+            'categories': categories,
+            'subcategories': subcategories,
+            'items': items,
+            'selected_category': category,
+            'selected_subcategory': subcategory,
+        })
+
     
 class ItemDetailView(DetailView):
     model = Item
