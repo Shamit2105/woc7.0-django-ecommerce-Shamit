@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (ItemCreateView,
-                    ItemListView,ItemDetailView,SearchResultsListView,ReviewView,SellerItemListView)
+                    ItemListView,ItemDetailView,SearchResultsListView,ReviewView,SellerItemListView,SellerItemUpdateView)
 
 urlpatterns = [
     path('', ItemListView.as_view(), name='home'),
@@ -8,5 +8,6 @@ urlpatterns = [
     path('review/<int:item_id>/', ReviewView.as_view(), name='review_form'),
     path('create_item/<int:user_id>/',ItemCreateView.as_view(),name='create_item'),
     path('seller_list/<int:user_id>',SellerItemListView.as_view(),name='seller_list'),
+    path("seller_item_update/<int:item_id>/", SellerItemUpdateView.as_view(), name="seller_item_update"),
     path('searchresults/',SearchResultsListView.as_view(),name='search_results')
 ]

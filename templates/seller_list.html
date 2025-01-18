@@ -21,7 +21,7 @@
             <td>{{ item.discount }}%</td>
             <td>{{ item.discounted_price }}</td>
             <td>
-                
+                <a href="{% url 'seller_item_update' item.id %}">Update</a>
             </td>
         </tr>
         {% endfor %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView,View
+from django.views.generic import CreateView, ListView, DetailView,View,UpdateView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -132,29 +132,17 @@ class SellerItemListView(LoginRequiredMixin, ListView):
         context["seller"] = get_object_or_404(CustomUser, id=user_id)
         return context
 
-class SellerItemUpdateView(LoginRequiredMixin,View):
+class SellerItemUpdateView(LoginRequiredMixin, UpdateView):
+    model = Item
+    form_class = ItemForm  # Use your custom form
     template_name = 'seller_item_update.html'
+    success_url = reverse_lazy('home')
+
+    def get_object(self, queryset=None):
+        item_id = self.kwargs.get("item_id")
+        return Item.objects.get(id=item_id)
     
-    """
-
-    def post(self,request,*args,**kwargs):
-        item_id = request.POST.get("item_id")
-        new_stock= request.POST.get("stock")
-        new_discount = request.POST.get("discount")
-
-        item = get_object_or_404(Item,id=item_id,seller=request.user)
-
-        if new_stock:
-            item.stock += new_stock
-
-        if new_discount:
-            item.discount = new_discount
-
-        item.save()
-
-        messages.success(request,f"Updated details for {item.name}.")
-        return redirect('seller_dashboard')
-    """
+    
         
         
         
