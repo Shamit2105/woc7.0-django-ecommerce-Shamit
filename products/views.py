@@ -122,19 +122,21 @@ class SellerItemListView(LoginRequiredMixin, ListView):
     template_name = "seller_list.html"
     context_object_name = "items"
 
-    def get_queryset(self):
+    def get(self, request, *args, **kwargs):
         user_id = self.kwargs.get("user_id")
-        return Item.objects.filter(seller_id=user_id)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user_id = self.kwargs.get("user_id")
-        context["seller"] = get_object_or_404(CustomUser, id=user_id)
-        return context
+        seller_items = Item.objects.filter(seller_id=user_id)
+        orders = UserOrder.objects.filter(item_ordered__in=seller_items)
+        customers = CustomUser.objects.filter(id__in=orders.values('ordered_by'))
+       
+        context = {
+            'items': seller_items,
+            'customers': customers,
+        }
+        return render(request, self.template_name, context)
 
 class SellerItemUpdateView(LoginRequiredMixin, UpdateView):
     model = Item
-    form_class = ItemForm  # Use your custom form
+    form_class = ItemForm
     template_name = 'seller_item_update.html'
     success_url = reverse_lazy('home')
 

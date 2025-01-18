@@ -11,6 +11,7 @@
             <th>Discount</th>
             <th>Price</th>
             <th>Actions</th>
+            <th>Customers</th>
         </tr>
     </thead>
     <tbody>
@@ -22,6 +23,11 @@
             <td>{{ item.discounted_price }}</td>
             <td>
                 <a href="{% url 'seller_item_update' item.id %}">Update</a>
+            </td>
+            <td>
+                {% for customer in customers %}
+                    {{ customer.username }} <br>
+                {% endfor %}
             </td>
         </tr>
         {% endfor %}
