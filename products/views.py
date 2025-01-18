@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
+from users.models import CustomUser
 from orders.models import UserOrder
 from .forms import ItemForm, ReviewForm
 from .models import Category, SubCategory, Item, Review
@@ -116,4 +117,46 @@ class ReviewView(LoginRequiredMixin, View):
 
         return render(request, 'review_form.html', {'form': form})
 
+class SellerItemListView(LoginRequiredMixin, ListView):
+    model = Item
+    template_name = "seller_list.html"
+    context_object_name = "items"
+
+    def get_queryset(self):
+        user_id = self.kwargs.get("user_id")
+        return Item.objects.filter(seller_id=user_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.kwargs.get("user_id")
+        context["seller"] = get_object_or_404(CustomUser, id=user_id)
+        return context
+
+class SellerItemUpdateView(LoginRequiredMixin,View):
+    template_name = 'seller_item_update.html'
     
+    """
+
+    def post(self,request,*args,**kwargs):
+        item_id = request.POST.get("item_id")
+        new_stock= request.POST.get("stock")
+        new_discount = request.POST.get("discount")
+
+        item = get_object_or_404(Item,id=item_id,seller=request.user)
+
+        if new_stock:
+            item.stock += new_stock
+
+        if new_discount:
+            item.discount = new_discount
+
+        item.save()
+
+        messages.success(request,f"Updated details for {item.name}.")
+        return redirect('seller_dashboard')
+    """
+        
+        
+        
+        
+     

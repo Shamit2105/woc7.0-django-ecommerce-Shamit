@@ -1,0 +1,31 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<h1>Your Items</h1>
+<div class="container mt-4">
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Stock</th>
+            <th>Discount</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.stock }}</td>
+            <td>{{ item.discount }}%</td>
+            <td>{{ item.discounted_price }}</td>
+            <td>
+                
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

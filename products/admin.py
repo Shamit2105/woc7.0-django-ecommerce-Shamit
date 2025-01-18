@@ -18,7 +18,9 @@ admin.site.register(SubCategory, SubCategoryAdmin)
 class ItemAdmin(admin.ModelAdmin):
     model = Item
     add_form = ItemForm
+    
     list_display = ('name', 'description', 'price', 'category', 'discount', 'stock', 'image', 'brand',)
+
 admin.site.register(Item, ItemAdmin)
 
 

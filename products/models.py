@@ -32,6 +32,7 @@ class Item(models.Model):
     brand = models.CharField(max_length=100)
     subcategories = models.ManyToManyField(SubCategory)
     ratings = models.DecimalField(default=0.0,max_digits=3,decimal_places=2)
+    seller = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True)
 
     """ jyare aapni entity(item) bija entity ni foreign key hoy ane e entity ni item specific fields access
     karvi hoy tyare e class name_set.all() karine kari saki"""
@@ -69,6 +70,7 @@ class Review(models.Model):
     def __str__(self):
         return f"Review for {self.item.name} by {self.review_author.username}"
     
+
 
 
 
