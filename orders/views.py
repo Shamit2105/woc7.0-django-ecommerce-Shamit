@@ -19,7 +19,7 @@ class OrderConfirmView(CustomerRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         item_id = self.kwargs.get('item_id')
         item = get_object_or_404(Item, id=item_id)
-        items = Order.objects.filter(user=request.user)
+        items = Order.objects.filter(user=request.user) #pela je order now ma nakhyu hoy pan order na karine kyak bije redirect kairu hoy to e item cart ma java devani
         for i in items:
             cart_item,created = Cart.objects.get_or_create(user=request.user, item=i.item)
             if not created:
@@ -50,7 +50,7 @@ class OrderLView(LoginRequiredMixin,ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Calculate total price of current orders
-        total_price = sum(item.get_total_price() for item in context['cart_items'])
+        total_price = sum(item.get_total_price() for item in context['cart_items']) # to show total_price in template
         context['total_price'] = total_price
         
         return context

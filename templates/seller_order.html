@@ -1,0 +1,47 @@
+{% extends "_base.html" %}
+{% block content %}
+<h2>Order Details</h2>
+<table class="table">
+    <tr>
+        <th>Customer:</th>
+        <td>{{ customer.username }}</td>
+    </tr>
+    <tr>
+        <th>Item:</th>
+        <td>{{ item.name }}</td>
+    </tr>
+    <tr>
+        <th>Quantity:</th>
+        <td>{{ quantity }}</td>
+    </tr>
+    <tr>
+        <th>State:</th>
+        <td>{{ state }}</td>
+    </tr>
+    <tr>
+        <th>City:</th>
+        <td>{{ city }}</td>
+    </tr>
+    <tr>
+        <th>Pincode:</th>
+        <td>{{ pin }}</td>
+    </tr>
+    <tr>
+        <th>Address:</th>
+        <td>{{ address }}</td>
+    </tr>
+    <tr>
+        <th>Phone:</th>
+        <td>{{ phno }}</td>
+    </tr>
+    <tr>
+        <th>Bill Number:</th>
+        <td>{{ billno }}</td>
+    </tr>
+    <tr>
+        <th>Date:</th>
+        <td>{{ date }}</td>
+    </tr>
+</table>
+<a href="{% url 'seller_order_list' %}" class="btn btn-secondary">Back to Orders</a>
+{% endblock %}

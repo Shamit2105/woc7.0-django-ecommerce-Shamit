@@ -16,8 +16,6 @@ class ItemCreateView(CreateView):
     template_name = 'item_create.html'
     success_url = reverse_lazy('home')
 
-    
-
 class ItemListView(View):
     template_name = 'home.html'
 
@@ -119,20 +117,16 @@ class ReviewView(LoginRequiredMixin, View):
 
 class SellerItemListView(LoginRequiredMixin, ListView):
     model = Item
-    template_name = "seller_list.html"
+    template_name = "seller_item_list.html"
     context_object_name = "items"
 
-    def get(self, request, *args, **kwargs):
-        user_id = self.kwargs.get("user_id")
-        seller_items = Item.objects.filter(seller_id=user_id)
-        orders = UserOrder.objects.filter(item_ordered__in=seller_items)
-        customers = CustomUser.objects.filter(id__in=orders.values('ordered_by'))
-       
-        context = {
-            'items': seller_items,
-            'customers': customers,
-        }
-        return render(request, self.template_name, context)
+    def get_queryset(self):
+        return Item.objects.filter(seller=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['items'] = self.get_queryset()
+        return context
 
 class SellerItemUpdateView(LoginRequiredMixin, UpdateView):
     model = Item
@@ -143,7 +137,47 @@ class SellerItemUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         item_id = self.kwargs.get("item_id")
         return Item.objects.get(id=item_id)
-    
+
+class SellerOrderListView(LoginRequiredMixin, ListView):
+    template_name = 'seller_order_list.html'
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        return UserOrder.objects.filter(item_ordered__seller=self.request.user).select_related('item_ordered', 'ordered_by')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['orders'] = self.get_queryset()
+        return context
+
+
+class SellerOrderDetailView(LoginRequiredMixin, View):
+    template_name = "seller_order.html"
+
+    def get(self, request, *args, **kwargs):
+        order_id = self.kwargs.get('order_id')
+        order = get_object_or_404(UserOrder, id=order_id)
+
+        if order.item_ordered.seller != self.request.user:
+            messages.warning(request, "You can only access orders for items you are selling.")
+            return redirect('seller_order_list')
+
+        context = {
+            'customer': order.ordered_by,
+            'quantity': order.quantity,
+            'state': order.state,
+            'city': order.city,
+            'pin': order.pincode,
+            'address': order.address,
+            'phno': order.phone,
+            'billno': order.get_unique_bill_id,
+            'date': order.date,
+            'item': order.item_ordered,
+        }
+        return render(request, self.template_name, context)
+
+
+
     
         
         

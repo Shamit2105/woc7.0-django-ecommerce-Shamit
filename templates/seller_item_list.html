@@ -1,0 +1,44 @@
+{% extends "_base.html" %}
+{% block content %}
+<h2>My Items</h2>
+
+{% if items %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Item Name</th>
+            <th>Category</th>
+            <th>Subcategories</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.category.name }}</td>
+            <td>
+                {% for subcategory in item.subcategories.all %}
+                    {{ subcategory.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td>₹{{ item.price }}</td>
+            <td>{{ item.stock }}</td>
+            <td>
+                <a href="{% url 'seller_item_update' item.id %}" class="btn btn-sm btn-warning">Edit</a>
+                
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>You haven't listed any items yet. <a href="{% url 'item_create' %}">Add a new item</a>.</p>
+{% endif %}
+
+<a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>
+{% endblock %}
