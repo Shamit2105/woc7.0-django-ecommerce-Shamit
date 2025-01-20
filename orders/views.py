@@ -97,25 +97,37 @@ class OrderView(View): #will have to use view instead of createview as items bul
                     pincode = form.cleaned_data['pincode'],
                     address = form.cleaned_data['address'],
                     phone = form.cleaned_data['phone'],
-                    price = item.discounted_price() * quantity
+                    price = item.discounted_price() * quantity,
+                    couponcode = form.cleaned_data['couponcode']
                 )
+
                 item.stock -= quantity
                 item.save()
             items.delete()
-            messages.success(request, "All items in your cart have been ordered.")
+            messages.success(request, "Item has been ordered.")
             return redirect('my_orders')
         return render(request, 'order_form.html', {'form': form})
     
     def clean(self):
         cleaned_data = super().clean()
         user = self.user
-        cart_items = Order.objects.filter(user=user)
+        cart_items = UserOrder.objects.filter(user=user)
+        couponcode = cleaned_data.get('couponcode')
         for cart_item in cart_items:
             item = cart_item.item
             if cart_item.quantity > item.stock:
                 messages.error( "No stock available")
                 redirect('home')
+            if couponcode:
+                if 'first5' == couponcode:
+                    discount_percentage = 5
+                    discounted_price = item.price - (item.price * discount_percentage / 100)
+                    cart_item.price = discounted_price
+                    messages.success(self.request, f"Coupon applied! {discount_percentage}% discount on {item.name}.")
+                else:
+                    messages.error(self.request, f"Invalid coupon code for {item.name}.")
         return cleaned_data
+        
 
 class UserOrderBillView(LoginRequiredMixin,DetailView):
     model = UserOrder

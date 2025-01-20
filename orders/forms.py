@@ -10,12 +10,8 @@ class OrderForm(forms.Form):
     pincode = forms.CharField(max_length=6)
     address = forms.CharField(widget=forms.Textarea)
     phone = forms.CharField(max_length=10)
-    couponcode = forms.CharField(max_length=10)
+    couponcode = forms.CharField(max_length=10,required=False)
 
-class OForm(forms.Form):
-    class Meta:
-        model = Order
-        fields = ['user','item','quantity']
 
 
 
