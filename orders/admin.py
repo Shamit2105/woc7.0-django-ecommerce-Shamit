@@ -3,7 +3,7 @@ from .models import UserOrder, Cart, Order
 
 class UserOrderAdmin(admin.ModelAdmin):
     model = UserOrder
-    list_display = ['ordered_by', 'item_ordered', 'quantity', 'price','state', 'city', 'pincode', 'address', 'phone', 'date', 'couponcode']
+    list_display = ['ordered_by', 'item_ordered', 'quantity','state', 'city', 'pincode', 'address', 'phone', 'date', 'couponcode']
 admin.site.register(UserOrder, UserOrderAdmin)
 
 class CartOrderAdmin(admin.ModelAdmin):

@@ -83,11 +83,17 @@ class OrderView(View): #will have to use view instead of createview as items bul
         if form.is_valid():
             items = Order.objects.filter(user=request.user)
             if not items.exists():
-                messages.error(request, "Your cart is empty.")
+                messages.error(request, "No Items Ordered!")
                 return redirect('cart')
             for cart_item in items:
                 item = cart_item.item
                 quantity = cart_item.quantity
+                price = item.discounted_price() * quantity
+                couponcode = form.cleaned_data['couponcode']
+                if couponcode == 'first5':
+                    discount_percentage = 5
+                    price -= price * discount_percentage / 100
+                    messages.success(request, f"Coupon applied! {discount_percentage}% discount on {item.name}.")
                 UserOrder.objects.create(
                     ordered_by = request.user,
                     item_ordered = item,
@@ -97,7 +103,7 @@ class OrderView(View): #will have to use view instead of createview as items bul
                     pincode = form.cleaned_data['pincode'],
                     address = form.cleaned_data['address'],
                     phone = form.cleaned_data['phone'],
-                    price = item.discounted_price() * quantity,
+                    price = price,
                     couponcode = form.cleaned_data['couponcode']
                 )
 
@@ -118,14 +124,6 @@ class OrderView(View): #will have to use view instead of createview as items bul
             if cart_item.quantity > item.stock:
                 messages.error( "No stock available")
                 redirect('home')
-            if couponcode:
-                if 'first5' == couponcode:
-                    discount_percentage = 5
-                    discounted_price = item.price - (item.price * discount_percentage / 100)
-                    cart_item.price = discounted_price
-                    messages.success(self.request, f"Coupon applied! {discount_percentage}% discount on {item.name}.")
-                else:
-                    messages.error(self.request, f"Invalid coupon code for {item.name}.")
         return cleaned_data
         
 
