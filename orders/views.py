@@ -6,6 +6,8 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django import forms
+from django.conf import settings
+from django.core.mail import send_mail
 
 
 from products.models import Item
@@ -109,6 +111,11 @@ class OrderView(View): #will have to use view instead of createview as items bul
 
                 item.stock -= quantity
                 item.save()
+            seller_email = item.seller.email 
+            subject = 'New Order Received'
+            message = f'You have received a new order from {request.user.email}.'
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [seller_email])
+
             items.delete()
             messages.success(request, "Item has been ordered.")
             return redirect('my_orders')

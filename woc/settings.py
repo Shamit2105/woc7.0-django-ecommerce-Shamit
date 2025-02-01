@@ -80,6 +80,14 @@ WSGI_APPLICATION = 'woc.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ekkatran@gmail.com'  
+EMAIL_HOST_PASSWORD = 'Testing@123456'  
+DEFAULT_FROM_EMAIL = 'ekkatran@gmail.com'  
+
 DATABASES = {
     'default': {
         'ENGINE' : 'django.db.backends.postgresql',
