@@ -85,7 +85,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ekkatran@gmail.com'  
-EMAIL_HOST_PASSWORD = 'Testing@123456'  
+EMAIL_HOST_PASSWORD = 'vlsu shij hdhx dymk'  
 DEFAULT_FROM_EMAIL = 'ekkatran@gmail.com'  
 
 DATABASES = {
