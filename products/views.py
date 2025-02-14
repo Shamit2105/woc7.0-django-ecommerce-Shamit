@@ -36,17 +36,16 @@ class ItemListView(View):
             items = items.filter(category__name=category)
         if subcategory:
             items = items.filter(subcategories__name=subcategory)
-        items = items.annotate(
-            discounted_price=F('price') * (1 - F('discount') / 100) # calculate discounted price by annotation
-        )
+       
+
         if sort_by == 'price_asc':
             items = items.order_by('discounted_price')
         elif sort_by == 'price_desc':
             items = items.order_by('-discounted_price')
         elif sort_by == 'rating_asc':
-            items = items.order_by('ratings')
+            items = items.order_by(('avg_rating'))
         elif sort_by == 'rating_desc':
-            items = items.order_by('-ratings')
+            items = items.order_by('-avg_rating')
 
         return items, category, subcategory, sort_by
 

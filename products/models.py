@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.signals import post_save,post_delete
+from django.db.models import Avg
 from django.dispatch import receiver
 
 from users.models import CustomUser
@@ -31,21 +32,17 @@ class Item(models.Model):
     subcategories = models.ManyToManyField(SubCategory)
     ratings = models.DecimalField(default=0.0,max_digits=3,decimal_places=2)
     seller = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    avg_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)  
 
-
-    """ jyare aapni entity(item) bija entity ni foreign key hoy ane e entity ni item specific fields access
-    karvi hoy tyare e class name_set.all() karine kari saki"""
-    def avg_rating(self): 
-        reviews = self.review_set.all()
-        if reviews:
-            total = sum(review.rating for review in reviews)
-            avg = total/reviews.count()
-            return avg
-        return 0.0
+    def save(self, *args, **kwargs):
         
+        self.discounted_price = self.price * (1 - self.discount / 100)
 
-    def discounted_price(self):
-        return self.price - self.discount * self.price / 100
+        avg = self.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating']
+        self.avg_rating = avg if avg else 0.0  
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
