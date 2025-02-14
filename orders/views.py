@@ -90,7 +90,7 @@ class OrderView(View): #will have to use view instead of createview as items bul
             for cart_item in items:
                 item = cart_item.item
                 quantity = cart_item.quantity
-                price = item.discounted_price() * quantity
+                price = item.discounted_price * quantity
                 couponcode = form.cleaned_data['couponcode']
                 if couponcode == 'first5':
                     discount_percentage = 5
@@ -222,7 +222,7 @@ class CartOrderView(View): #will have to use view instead of createview as items
                     pincode = form.cleaned_data['pincode'],
                     address = form.cleaned_data['address'],
                     phone = form.cleaned_data['phone'],
-                    price = item.discounted_price() * quantity
+                    price = item.discounted_price * quantity
                 )
                 item.stock -= quantity
                 item.save()

@@ -20,7 +20,7 @@ class UserOrder(models.Model):
         return f'{self.ordered_by} ordered {self.quantity} {self.item_ordered} on {self.date}'
     
     def get_total_price(self):
-        price = self.quantity * self.item_ordered.discounted_price()
+        price = self.quantity * self.item_ordered.discounted_price
         return price
     
 
@@ -39,7 +39,7 @@ class Order(models.Model):
     quantity = models.PositiveIntegerField(default=0)
 
     def get_total_price(self):
-        return self.item.discounted_price() * self.quantity
+        return self.item.discounted_price * self.quantity
     
     def __str__(self):
         return f'{self.user.username} - {self.item.name} - '
@@ -51,7 +51,7 @@ class Cart(models.Model):
     quantity = models.PositiveIntegerField(default=0)
 
     def get_total_price(self):
-        return self.item.discounted_price() * self.quantity
+        return self.item.discounted_price * self.quantity
     
     def __str__(self):
         return f'{self.user.username} - {self.item.name} - '
