@@ -3,7 +3,8 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView,View,UpdateView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Q,F
+from django.db.models.functions import Cast
 
 from users.models import CustomUser
 from orders.models import UserOrder
@@ -16,40 +17,60 @@ class ItemCreateView(CreateView):
     template_name = 'item_create.html'
     success_url = reverse_lazy('home')
 
+from django.shortcuts import render
+from django.views import View
+from .models import Category, SubCategory, Item
+
 class ItemListView(View):
     template_name = 'home.html'
 
-    def get(self, request, *args, **kwargs):
-        # Handle initial page load or reset filters
-        categories = Category.objects.all()
-        subcategories = SubCategory.objects.all()
+    def get_filtered_items(self, request):
+        
+        category = request.GET.get('category') or request.POST.get('category')
+        subcategory = request.GET.get('subcategory') or request.POST.get('subcategory')
+        sort_by = request.GET.get('sort_by') or request.POST.get('sort_by')
+
         items = Item.objects.all()
 
-        return render(request, self.template_name, {
-            'categories': categories,
-            'subcategories': subcategories,
-            'items': items,
-        })
-
-    def post(self, request, *args, **kwargs):
-        category = request.POST.get('category')
-        subcategory = request.POST.get('subcategory')
-        items = Item.objects.all()
         if category:
             items = items.filter(category__name=category)
         if subcategory:
             items = items.filter(subcategories__name=subcategory)
+        items = items.annotate(
+            discounted_price=F('price') * (1 - F('discount') / 100) # calculate discounted price by annotation
+        )
+        if sort_by == 'price_asc':
+            items = items.order_by('discounted_price')
+        elif sort_by == 'price_desc':
+            items = items.order_by('-discounted_price')
+        elif sort_by == 'rating_asc':
+            items = items.order_by('ratings')
+        elif sort_by == 'rating_desc':
+            items = items.order_by('-ratings')
+
+        return items, category, subcategory, sort_by
+
+    def get(self, request, *args, **kwargs):
+        
+        items, category, subcategory, sort_by = self.get_filtered_items(request)
+
         categories = Category.objects.all()
         subcategories = SubCategory.objects.all()
+
         return render(request, self.template_name, {
             'categories': categories,
             'subcategories': subcategories,
             'items': items,
             'selected_category': category,
             'selected_subcategory': subcategory,
+            'selected_sort': sort_by,
         })
 
-    
+    def post(self, request, *args, **kwargs):
+        
+        return self.get(request, *args, **kwargs)
+
+  
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'product_detail.html'
@@ -63,24 +84,19 @@ class ItemDetailView(DetailView):
 class SearchResultsListView(ListView):
     model = Item
     context_object_name = 'items'
-    template_name = 'search_results.html'
+    template_name = 'home.html'  
 
     def get_queryset(self):
         query = self.request.GET.get('q')
+        
         if not query:
-            return Item.objects.none()  
+            return Item.objects.none()
 
         items = Item.objects.filter(
             Q(name__icontains=query) | 
             Q(category__name__icontains=query) | 
             Q(subcategories__name__icontains=query)
         ).distinct()
-
-        if not items.exists():
-            messages.warning(self.request, "No such item found.")
-            return Item.objects.none()  
-
-        return items
 
     def get(self, request, *args, **kwargs):
         if not self.get_queryset().exists():
