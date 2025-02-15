@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import (ItemCreateView, SellerOrderListView,SellerOrderDetailView,
-                    ItemListView,ItemDetailView,SearchResultsListView,ReviewView,SellerItemListView,SellerItemUpdateView)
+                    ItemListView,ItemDetailView,ReviewView,SellerItemListView,SellerItemUpdateView)
 
 
 urlpatterns = [
@@ -13,5 +13,5 @@ urlpatterns = [
     path('seller/items/',SellerItemListView.as_view(),name='seller_item_list'),
     path('seller/orders/<int:order_id>/', SellerOrderDetailView.as_view(), name='seller_order_detail'),
     path("seller_item_update/<int:item_id>/", SellerItemUpdateView.as_view(), name="seller_item_update"),
-    path('searchresults/',SearchResultsListView.as_view(),name='search_results')
+    #path('searchresults/',SearchResultsListView.as_view(),name='search_results')
 ]

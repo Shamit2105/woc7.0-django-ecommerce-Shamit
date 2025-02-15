@@ -55,10 +55,11 @@
                         </ul>
                     </li>
                     {% endif %}
-                    <form class="d-flex" action="{% url 'search_results' %}" method="get">
-                        <input name="q" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <form method="get" action="{% url 'home' %}">
+                        <input type="text" name="q" value="{% if query %}{{ query }}{% else %}{% endif %}" placeholder="Search">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
+                    
                     
                     {% if user.user_type == 'customer' %}
                     <a class="nav-link" href="{% url 'cart' %}">

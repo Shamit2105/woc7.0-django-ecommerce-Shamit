@@ -27,33 +27,38 @@ class ItemListView(View):
     template_name = 'home.html'
 
     def get_filtered_items(self, request):
-        
+        query = request.GET.get('q')
         category = request.GET.get('category') or request.POST.get('category')
         subcategory = request.GET.get('subcategory') or request.POST.get('subcategory')
         sort_by = request.GET.get('sort_by') or request.POST.get('sort_by')
 
         items = Item.objects.all()
 
+        if query:
+            items = items.filter(
+                Q(name__icontains=query) | 
+                Q(category__name__icontains=query) | 
+                Q(subcategories__name__icontains=query)
+            ).distinct()
+
         if category:
             items = items.filter(category__name=category)
         if subcategory:
             items = items.filter(subcategories__name=subcategory)
-       
 
         if sort_by == 'price_asc':
             items = items.order_by('discounted_price')
         elif sort_by == 'price_desc':
             items = items.order_by('-discounted_price')
         elif sort_by == 'rating_asc':
-            items = items.order_by(('avg_rating'))
+            items = items.order_by('avg_rating')
         elif sort_by == 'rating_desc':
             items = items.order_by('-avg_rating')
 
-        return items, category, subcategory, sort_by
+        return items, category, subcategory, sort_by, query
 
     def get(self, request, *args, **kwargs):
-        
-        items, category, subcategory, sort_by = self.get_filtered_items(request)
+        items, category, subcategory, sort_by, query = self.get_filtered_items(request)
 
         categories = Category.objects.all()
         subcategories = SubCategory.objects.all()
@@ -65,12 +70,11 @@ class ItemListView(View):
             'selected_category': category,
             'selected_subcategory': subcategory,
             'selected_sort': sort_by,
+            'query': query,
         })
 
     def post(self, request, *args, **kwargs):
-        
         return self.get(request, *args, **kwargs)
-
   
 class ItemDetailView(DetailView):
     model = Item
@@ -81,7 +85,7 @@ class ItemDetailView(DetailView):
         # Fetch all reviews for the specific item
         context['reviews'] = Review.objects.filter(item=self.object).order_by('-created_at')  
         return context
-
+"""
 class SearchResultsListView(ListView):
     model = Item
     context_object_name = 'items'
@@ -103,6 +107,7 @@ class SearchResultsListView(ListView):
         if not self.get_queryset().exists():
             return redirect('home')  
         return super().get(request, *args, **kwargs)
+"""
 
 class ReviewView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -131,6 +136,7 @@ class ReviewView(LoginRequiredMixin, View):
             return redirect('home')
 
         return render(request, 'review_form.html', {'form': form})
+
 
 class SellerItemListView(LoginRequiredMixin, ListView):
     model = Item
