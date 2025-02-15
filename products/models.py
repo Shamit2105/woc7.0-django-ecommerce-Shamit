@@ -38,10 +38,11 @@ class Item(models.Model):
     def save(self, *args, **kwargs):
         self.discounted_price = self.price * (1 - self.discount / 100)
         super().save(*args, **kwargs)
-        if self.pk:
-            avg = self.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating']
-            self.avg_rating = avg if avg else 0.0
-            super().save(update_fields=['avg_rating'])
+
+    def update_avg_rating(self):
+        avg = self.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating']
+        self.avg_rating = avg if avg else 0.0
+        self.save(update_fields=['avg_rating'])
 
     def __str__(self):
         return self.name
@@ -61,9 +62,21 @@ class Review(models.Model):
     rating = models.IntegerField(choices=RATING_CHOICES,default=3)
     review = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True,null=True)
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.item.update_avg_rating()
+
+    def delete(self, *args, **kwargs):
+        item = self.item
+        super().delete(*args, **kwargs)
+        item.update_avg_rating()
 
     def __str__(self):
         return f"Review for {self.item.name} by {self.review_author.username}"
+
+
+
     
 
 
