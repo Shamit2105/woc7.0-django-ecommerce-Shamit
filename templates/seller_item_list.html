@@ -37,7 +37,7 @@
     </tbody>
 </table>
 {% else %}
-<p>You haven't listed any items yet. <a href="{% url 'item_create' %}">Add a new item</a>.</p>
+<p>You haven't listed any items yet. <a href="{% url 'create_item' user.id %}">Add a new item</a>.</p>
 {% endif %}
 
 <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>

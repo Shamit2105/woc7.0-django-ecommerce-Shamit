@@ -35,18 +35,13 @@ class Item(models.Model):
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     avg_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)  
 
-    def save(self, request,*args, **kwargs):
+    def save(self, *args, **kwargs):
         self.discounted_price = self.price * (1 - self.discount / 100)
-        if not self.pk and 'request' in kwargs:
-            request = kwargs.pop('request')
-            if request and request.user.is_authenticated:
-                self.seller = request.user
         super().save(*args, **kwargs)
         if self.pk:
             avg = self.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating']
             self.avg_rating = avg if avg else 0.0
             super().save(update_fields=['avg_rating'])
-
 
     def __str__(self):
         return self.name

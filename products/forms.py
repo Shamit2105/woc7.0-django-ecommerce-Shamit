@@ -9,15 +9,18 @@ class ItemForm(forms.ModelForm):
         model = Item
         fields = ['name', 'description', 'price', 'category_name', 'discount', 'stock', 'image', 'brand', 'subcategories_names']
 
-    def save(self, commit=True):
+    def save(self, commit=True, user=None):  
         category_name = self.cleaned_data['category_name']
         subcategories_names = self.cleaned_data['subcategories_names']
-
+        
         category, created = Category.objects.get_or_create(name=category_name)
 
-        
         item = super().save(commit=False)
         item.category = category
+
+        if user and user.is_authenticated: 
+            item.seller = user
+
         if commit:
             item.save()
 

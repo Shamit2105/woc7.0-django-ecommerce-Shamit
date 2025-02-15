@@ -12,15 +12,17 @@ from .forms import ItemForm, ReviewForm
 from .models import Category, SubCategory, Item, Review
 
 class ItemCreateView(CreateView):
-    model = Item
-    form_class = ItemForm
-    template_name = 'item_create.html'
-    success_url = reverse_lazy('home')
+    def get(self, request, *args, **kwargs):
+        form = ItemForm()
+        return render(request, 'item_create.html', {'form': form})
 
-from django.shortcuts import render
-from django.views import View
-from .models import Category, SubCategory, Item
-
+    def post(self, request, *args, **kwargs):
+        form = ItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save(commit=True, user=request.user)
+            return redirect('home')
+        return render(request, 'item_create.html', {'form': form})
+    
 class ItemListView(View):
     template_name = 'home.html'
 
