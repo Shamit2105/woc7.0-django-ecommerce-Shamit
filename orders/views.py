@@ -241,4 +241,22 @@ class CartOrderView(View): #will have to use view instead of createview as items
                 messages.error( "No stock available")
                 redirect('home')
         return cleaned_data
+    
+class CancelOrderView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        order_id = self.kwargs.get('order_id')
+        order = get_object_or_404(UserOrder, id=order_id, ordered_by=request.user)
+        
+        if order.can_be_canceled():
+            seller_email = order.item_ordered.seller.email
+            subject = 'Order Canceled'
+            message = f'The order for {order.item_ordered.name} by {request.user.email} has been canceled.'
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [seller_email])
+            
+            order.delete()
+            messages.success(request, "Order has been canceled.")
+        else:
+            messages.error(request, "Order cannot be canceled as it is too close to the delivery date.")
+        
+        return redirect('my_orders')
 

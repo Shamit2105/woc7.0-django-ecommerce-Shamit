@@ -3,6 +3,7 @@ from .views import (
     OrderView, UserOrderBillView, OrderConfirmView, PreviousOrderListView,OrderLView,
     AddToCartView, CartListView, CartDeleteView, CartOrderView,
     DecreaseQuantityView, IncreaseQuantityView, OrderIncreaseQuantityView,OrderDecreaseQuantityView
+    ,CancelOrderView
 )
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     path('cart/order-all/', CartOrderView.as_view(), name='order_all_cart_items'),
     path('cart/increase/<int:pk>/', IncreaseQuantityView.as_view(), name='cart_increase'),
     path('cart/decrease/<int:pk>/', DecreaseQuantityView.as_view(), name='cart_decrease'),  
+    path('cancel_order/<int:order_id>/', CancelOrderView.as_view(), name='cancel_order'),
 ]

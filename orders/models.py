@@ -1,7 +1,8 @@
 from django.db import models
 from users.models import CustomUser
 from products.models import Item
-from datetime import timedelta
+from datetime import timedelta,datetime
+from django.utils import timezone
 
 class UserOrder(models.Model):
     ordered_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -25,13 +26,17 @@ class UserOrder(models.Model):
     
 
     def get_delivery_date(self):
-        delivery_date = self.date + timedelta(days=7)  # Assuming a fixed delivery time of 7 days
-        return f'by {delivery_date.strftime("%d-%m-%Y %H:%M:%S")}'
+        return self.date + timedelta(days=7)
+
  
 
     def get_unique_bill_id(self):
         return f'BILL-{self.id:08d}'
     
+    def can_be_canceled(self):
+        current_date = timezone.now()  # Use Django's timezone-aware datetime
+        delivery_date = self.get_delivery_date()
+        return (delivery_date - current_date).days >= 2
 
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True)

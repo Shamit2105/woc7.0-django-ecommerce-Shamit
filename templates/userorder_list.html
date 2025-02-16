@@ -27,14 +27,26 @@ My Orders
                 <td>{{ order.quantity }}</td>
                 <td>₹{{ order.price }}</td>
                 <td>{{ order.date }}</td>
-                <td>{{ order.get_delivery_date }}</td>
+                <td>{{ order.get_delivery_date|date:"d-m-Y H:i:s" }}</td>
                 <td>
                     <a href="{% url 'order_bill' order.pk %}" class="btn btn-primary">View Bill</a>
-                    <a href="{% url 'review_form' order.item_ordered.pk %}" class = "btn btn-success">Review</a>
+                    <a href="{% url 'review_form' order.item_ordered.pk %}" class="btn btn-success">Review</a>
+                    {% if order.can_be_canceled %}
+                    <form method="post" action="{% url 'cancel_order' order.id %}" onsubmit="return confirmCancelOrder();">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Cancel Order</button>
+                    </form>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<script>
+function confirmCancelOrder() {
+    return confirm("Are you sure you want to cancel this order?");
+}
+</script>
 {% endblock content %}
