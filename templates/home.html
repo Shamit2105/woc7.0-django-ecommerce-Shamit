@@ -45,12 +45,14 @@ Home
         </form>
         <form method="GET">
             <select name="sort_by" onchange="this.form.submit()">
-                <option value="">Sort by</option>
                 <option value="price_asc" {% if selected_sort == "price_asc" %}selected{% endif %}>Price: Low to High</option>
                 <option value="price_desc" {% if selected_sort == "price_desc" %}selected{% endif %}>Price: High to Low</option>
                 <option value="rating_asc" {% if selected_sort == "rating_asc" %}selected{% endif %}>Rating: Low to High</option>
                 <option value="rating_desc" {% if selected_sort == "rating_desc" %}selected{% endif %}>Rating: High to Low</option>
+                <option value="rating_desc_price_asc" {% if selected_sort == "rating_desc_price_asc" %}selected{% endif %}>Rating High to Low, Price Low to High</option>
+                <option value="rating_asc_price_asc" {% if selected_sort == "rating_asc_price_asc" %}selected{% endif %}>Rating Low to High, Price Low to High</option>
             </select>
+            
         </form>
         
     </div>

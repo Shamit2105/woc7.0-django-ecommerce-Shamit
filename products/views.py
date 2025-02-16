@@ -54,6 +54,11 @@ class ItemListView(View):
             items = items.order_by('avg_rating')
         elif sort_by == 'rating_desc':
             items = items.order_by('-avg_rating')
+        elif sort_by == 'rating_desc_price_asc':
+            items = items.order_by('-avg_rating', 'discounted_price')
+        elif sort_by == 'rating_asc_price_asc':
+            items = items.order_by('avg_rating', 'discounted_price')
+
 
         return items, category, subcategory, sort_by, query
 
